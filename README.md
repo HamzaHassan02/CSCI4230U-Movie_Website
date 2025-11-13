@@ -3,3 +3,4 @@ Movie Website for Final Group Project of CSCI 4230U Advanced Web Development Fal
 
 ### Group Members
 - Hamza Hassan (100788913)
+- Abdullah Mohammed (100784442)

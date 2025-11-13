@@ -1,0 +1,289 @@
+/* ------------------------- */
+/* Global Reset + Typography */
+/* ------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+}
+
+/* ------------- */
+/* Navbar (BEM)  */
+/* ------------- */
+.navbar {
+  background-color: #222;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar__logo {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.navbar__links {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__link {
+  text-decoration: none;
+  color: white;
+  font-size: 1rem;
+}
+
+.navbar__link--logout {
+  color: #ff6b6b;
+}
+
+/* ---------------- */
+/* Login Page (BEM) */
+/* ---------------- */
+.login {
+  width: 320px;
+  margin: 100px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.login__title {
+  margin-bottom: 20px;
+}
+
+.login__input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+.login__button {
+  width: 100%;
+  padding: 12px;
+  background: #4169e1;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login__button:hover {
+  background: #3156c7;
+}
+
+/* ------------------- */
+/* Movie List (Home)   */
+/* ------------------- */
+.movie-list__title {
+  text-align: center;
+  margin: 30px 0;
+}
+
+.movie-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px 30px;
+  justify-content: center;
+}
+
+/* Movie card is now an <a> */
+.movie-card {
+  display: block;
+  background: white;
+  width: 180px;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  color: black;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.movie-card:hover {
+  transform: translateY(-3px);
+  transition: 0.2s;
+}
+
+.movie-card__poster {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.movie-card__title {
+  margin-top: 10px;
+}
+
+/* ---------------------- */
+/* Movie Details (BEM)    */
+/* ---------------------- */
+.movie-details {
+  display: flex;
+  gap: 30px;
+  padding: 40px;
+}
+
+.movie-details__poster {
+  width: 250px;
+  border-radius: 8px;
+}
+
+.movie-details__info {
+  max-width: 500px;
+}
+
+.movie-details__button {
+  padding: 12px 16px;
+  margin-top: 15px;
+  background: #4169e1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* -------------------- */
+/* Booking Form (BEM)   */
+/* -------------------- */
+.booking__title {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.booking-form {
+  width: 320px;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.booking-form__label {
+  margin-top: 15px;
+  display: block;
+  font-weight: bold;
+}
+
+.booking-form__input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+.booking-form__showtimes {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.booking-form__showtime {
+  padding: 10px;
+  background: #eee;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.booking-form__button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.booking-form__button--confirm {
+  background: #28a745;
+  color: white;
+}
+
+.booking-form__button--cancel {
+  background: #ccc;
+}
+
+/* --------------------- */
+/* My Bookings (BEM)     */
+/* --------------------- */
+.bookings__title {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.bookings {
+  width: 90%;
+  max-width: 700px;
+  margin: 20px auto;
+}
+
+.booking-card {
+  padding: 15px;
+  background: white;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.booking-card__button {
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin-right: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.booking-card__button--cancel {
+  background: #ff6b6b;
+  color: white;
+}
+
+/* ---------------------- */
+/* Admin Dashboard (BEM)  */
+/* ---------------------- */
+.admin__title {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.admin {
+  width: 90%;
+  max-width: 700px;
+  margin: 20px auto;
+}
+
+.admin-user {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.admin-user__button {
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+}
+
+.admin-user__button--danger {
+  background: #ff6b6b;
+  color: white;
+}

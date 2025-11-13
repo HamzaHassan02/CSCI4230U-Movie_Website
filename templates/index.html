@@ -1,0 +1,14 @@
+<!-- index.html (Login) -->
+{% extends 'base.html' %}
+{% set show_navbar = false %}
+{% block title %}Login | MovieReservation{% endblock %}
+{% block content %}
+<div class="login">
+<h2 class="login__title">Welcome to MovieReservation</h2>
+<input class="login__input" type="text" placeholder="Username">
+<input class="login__input" type="password" placeholder="Password">
+<a href="{{ url_for('home') }}">
+  <button class="login__button">Login</button>
+</a>
+</div>
+{% endblock %}

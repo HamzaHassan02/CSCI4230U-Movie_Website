@@ -11,6 +11,7 @@ MarkupSafe==3.0.3
 pydantic==2.12.4
 pydantic_core==2.41.5
 PyJWT==2.10.1
+python-dotenv==1.2.1
 SQLAlchemy==2.0.44
 typing-inspection==0.4.2
 typing_extensions==4.15.0

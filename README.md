@@ -14,7 +14,23 @@ source venv/bin/activate # or for windows source venv/Scripts/activate
 ```
 pip install -r requirements.txt
 ```
-3. Start app
+3. Create your environment variables  
+Make a copy of `.env.example` and rename it to `.env`:
+
+```
+cp .env.example .env
+```
+
+Then open `.env` and fill in:
+
+```
+SECRET_KEY=your_flask_secret_key
+JWT_SECRET_KEY=your_jwt_secret_key
+PEPPER=your_pepper_value
+DATABASE_URL=sqlite:///database.db
+```
+
+4. Start app
 ```
 python app.py
 ```

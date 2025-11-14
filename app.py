@@ -1,20 +1,22 @@
-import datetime
 from flask import Flask, render_template, url_for, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-import jwt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token
+import os
+from dotenv import load_dotenv
 
-PEPPER = b'secret_pepper_value'
+load_dotenv()
+
+PEPPER = os.getenv("PEPPER").encode('utf-8')
 
 app = Flask(__name__)
 # Configure SQLite Database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SECRET_KEY'] = 'secret_key'
-app.config["JWT_SECRET_KEY"] = "jwt_secret_key"
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 db = SQLAlchemy(app)
 
 jwt = JWTManager(app)

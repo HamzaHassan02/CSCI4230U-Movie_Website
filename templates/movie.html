@@ -1,0 +1,18 @@
+<!-- movie.html (Movie details) -->
+{% extends 'base.html' %}
+{% set show_navbar = true %}
+{% block content %}
+<div class="movie-details">
+<img class="movie-details__poster" src="{{ movie.poster_url }}">
+<div class="movie-details__info">
+<h2 class="movie-details__title">{{ movie.title }}</h2>
+<p><b>Director:</b> {{ movie.director }}</p>
+<p><b>Genres:</b> {{ movie.genre }}</p>
+<p><b>Rating:</b> {{ movie.rating }}</p>
+<a href=""></a>
+<a href="{{ url_for('booking', movie_id=movie.id) }}">
+  <button class="movie-details__button">Book Now</button>
+</a>
+</div>
+</div>
+{% endblock %}

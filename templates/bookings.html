@@ -1,0 +1,19 @@
+<!-- bookings.html -->
+{% extends 'base.html' %}
+{% set show_navbar = true %}
+{% block content %}
+<h1 class="bookings__title">My Bookings</h1>
+<div class="bookings">
+{% for b in bookings %}
+<div class="booking-card">
+<h3 class="booking-card__title">{{ b.movie_title }}</h3>
+<p class="booking-card__info">{{ b.datetime }}</p>
+<p class="booking-card__info">Seats: {{ b.quantity }}</p>
+<a href="{{ url_for('booking', booking_id=b.id) }}">
+  <button class="booking-card__button">Edit</button>
+</a>
+<button class="booking-card__button booking-card__button--cancel">Cancel</button>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

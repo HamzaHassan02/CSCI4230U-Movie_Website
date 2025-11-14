@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+    <h2 class="register-title">Create an Account</h2>
+    <form id="register-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit" class="register-button">Register</button>
+    </form>
+        <p id="register-message"></p>
+
+
+    <script>
+        const signupForm = document.getElementById('register-form'); // getting the signup form element
+        signupForm.addEventListener('submit', async (event) => { // adding submit event listener to the signup form
+        event.preventDefault(); // preventing the reloading of the page
+        const formData = new FormData(signupForm); // creating a FormData object from the form
+        const data = Object.fromEntries(formData); // converting FormData to a regular object
+        const response = await fetch('/register', { // sending POST request to the server
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data) // sending the signup data as JSON string
+        });
+        const result = await response.json(); // getting the JSON response and saving to result
+        document.getElementById('register-message').innerText = result.message; // displaying the signup message
+    });
+    </script>
+</body>
+</html>

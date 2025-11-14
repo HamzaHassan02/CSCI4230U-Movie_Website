@@ -13,3 +13,15 @@
 {% endfor %}
 </div>
 {% endblock %}
+
+<script>
+    // Get token from browser storage
+    const token = localStorage.getItem("jwt");
+
+    if (!token) {
+        // If no token found, redirect to login page
+        window.location.href = "/login";
+    }
+
+    console.log("Token loaded:", token);
+</script>

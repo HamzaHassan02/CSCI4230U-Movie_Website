@@ -5,6 +5,7 @@ import jwt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import bcrypt
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token
 
 PEPPER = b'secret_pepper_value'
 
@@ -12,9 +13,11 @@ app = Flask(__name__)
 # Configure SQLite Database
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SECRET_KEY'] = 'your_secret_key_here'
+app.config['SECRET_KEY'] = 'secret_key'
+app.config["JWT_SECRET_KEY"] = "jwt_secret_key"
 db = SQLAlchemy(app)
 
+jwt = JWTManager(app)
 
 #password hashing functions
 def hash_password(password):
@@ -27,16 +30,6 @@ def verify_password(entered_password, stored_hashed_password, stored_salt):
     entered_password_with_pepper = entered_password.encode('utf-8') + PEPPER # Combine entered_password and PEPPER
     hashed_entered_password = bcrypt.hashpw(entered_password_with_pepper, stored_salt) # Use bcrypt.hashpw() to hash the entered password with the stored_salt
     return hashed_entered_password == stored_hashed_password # Compare hashed_entered_password with stored_hashed_password
-
-#jwt functions
-def create_jwt(username):
-    payload = {
-        'sub': username,
-        'iat': datetime.datetime.utcnow(), # Set the issued-at time to the current UTC time
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30) # Set the expiration time to 30 minutes from now
-    }
-    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256') # Use jwt.encode() to create a JWT token with the payload and the secret key
-    return token
 
 #models
 class User(db.Model):
@@ -134,7 +127,7 @@ def login():
 
         # Verify the password using the verify_password function
         if verify_password(password, user.password_hash, user.salt):
-            token = create_jwt(username)  # Call the create_jwt function to generate a JWT token for the user
+            token = create_access_token(identity=username)  # Call the create_jwt function to generate a JWT token for the user
             return jsonify({'message': 'Successful login', 'token': token}), 200  # Respond with a success message and the token
         else:
             return jsonify({'message': 'Invalid password'}), 401  # Respond with an error message (Invalid password)
@@ -162,6 +155,7 @@ def bookings():
     return render_template("bookings.html", bookings=dummy_bookings)
 
 @app.route("/admin")
+@jwt_required()
 def admin_dashboard():
     dummy_users = [
         {"username": "hamza", "booking_count": 3},

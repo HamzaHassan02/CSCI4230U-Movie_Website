@@ -34,3 +34,4 @@ DATABASE_URL=sqlite:///database.db
 ```
 python app.py
 ```
+- Abdullah Mohammed (100784442)

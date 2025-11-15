@@ -1,45 +1,60 @@
-import os
+from seleniumbase import BaseCase
 import uuid
 
-from seleniumbase import BaseCase
+class AuthTests(BaseCase):
+    stored_username = None
 
+    def test_01_register_user(self):
+        # Visit the register page
+        self.open("http://localhost:5000/register")
 
-BASE_URL = os.getenv("E2E_BASE_URL", "http://localhost:5000").rstrip("/")
+        username = f"selenium_{uuid.uuid4().hex[:8]}"
+        AuthTests.stored_username = username
 
+        # Fill the form
+        self.type('input[name="username"]', username)
+        self.type('input[name="password"]', "Password123!")
 
-class RegisterLoginFlowTests(BaseCase):
-    #End-to-end coverage of the register and login flows. 
+        # Submit form
+        self.click('button[type="submit"]')
 
-    def setUp(self):
-        super().setUp()
-        self.base_url = BASE_URL
+        # Assert success message appears on the page
+        self.assert_text("User registered successfully", "body")
 
-    def _unique_credentials(self):
-        suffix = uuid.uuid4().hex[:8]
-        return f"selenium_user_{suffix}", "SeleniumTest123!"
+    def test_02_login_success(self):
+        self.open("http://localhost:5000/")
 
-    def _register_via_ui(self, username, password):
-        self.open(f"{self.base_url}/register")
-        self.wait_for_element_visible("#register-form", timeout=10)
-        self.type("#register-form #username", username)
-        self.type("#register-form #password", password)
-        self.click("#register-form button.register-button")
-        self.wait_for_text("User registered successfully", "#register-message", timeout=8)
+        username = AuthTests.stored_username
 
-    def _login_via_ui(self, username, password):
-        self.open(f"{self.base_url}/")
-        self.wait_for_element_visible("#landing-login-form", timeout=10)
-        self.type("#landing-login-form input[name='username']", username)
-        self.type("#landing-login-form input[name='password']", password)
-        self.click("#landing-login-form button.login__button")
-        self.wait_for_element("h1.movie-list__title", timeout=10)
-        self.assert_true(self.get_current_url().endswith("/home"))
+        # Log in using the same test user
+        self.type('input[name="username"]', username)
+        self.type('input[name="password"]', "Password123!")
 
-    def test_user_can_register(self):
-        username, password = self._unique_credentials()
-        self._register_via_ui(username, password)
+        self.click('button[type="submit"]')
 
-    def test_user_can_login(self):
-        username, password = self._unique_credentials()
-        self._register_via_ui(username, password)
-        self._login_via_ui(username, password)
+        # Assert that login redirected to the movie page
+        self.assert_text("Now Showing", "body")
+
+    def test_03_login_invalid_password(self):
+        self.open("http://localhost:5000/")
+
+        username = AuthTests.stored_username
+
+        self.type('input[name="username"]', username)
+        self.type('input[name="password"]', "WrongPassword")
+
+        self.click('button[type="submit"]')
+
+        # Assert invalid password message
+        self.assert_text("Invalid password", "body")
+
+    def test_04_login_user_not_found(self):
+        self.open("http://localhost:5000/")
+
+        self.type('input[name="username"]', "ghost_user")
+        self.type('input[name="password"]', "anything")
+
+        self.click('button[type="submit"]')
+
+        # Assert user does not exist message
+        self.assert_text("User does not exist", "body")

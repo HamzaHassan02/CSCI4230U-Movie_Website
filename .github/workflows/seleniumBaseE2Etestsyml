@@ -2,7 +2,10 @@ name: SeleniumBase E2E Tests
 
 on:
   push:
-    branches: ["**"]
+    branches: 
+      - main
+      - dev
+      - feature/frontend
   pull_request:
 
 jobs:

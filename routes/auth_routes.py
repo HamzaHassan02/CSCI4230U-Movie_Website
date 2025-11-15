@@ -2,7 +2,7 @@ import os
 
 import bcrypt
 from dotenv import load_dotenv
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 from flask_jwt_extended import create_access_token
 
 from models import db, User
@@ -59,7 +59,7 @@ def register():
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login_page.html")
+        return redirect(url_for("home_page"))
 
     data = request.get_json()
     username = data.get('username')

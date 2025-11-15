@@ -16,7 +16,7 @@
 <li class="navbar__item"><a class="navbar__link" href="{{ url_for('home') }}">Home</a></li>
 <li class="navbar__item"><a class="navbar__link" href="{{ url_for('bookings') }}">My Bookings</a></li>
 <li class="navbar__item"><a class="navbar__link" href="{{ url_for('admin_dashboard') }}">Admin</a></li>
-<li class="navbar__item"><a class="navbar__link navbar__link--logout" href="{{ url_for('login') }}">Logout</a></li>
+<li class="navbar__item"><a class="navbar__link navbar__link--logout" href="{{ url_for('auth.login') }}">Logout</a></li>
 </ul>
 </nav>
 {% endif %}

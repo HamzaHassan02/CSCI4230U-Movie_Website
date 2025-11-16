@@ -1,12 +1,13 @@
 import re
 from typing import Any, Dict
 
-from marshmallow import Schema, ValidationError, fields, pre_load, validates
+from marshmallow import Schema, ValidationError, fields, pre_load, validates, validate
 
 
 class RegisterSchema(Schema):
     username = fields.Str(required=True)
     password = fields.Str(required=True)
+    role = fields.Str(load_default="user", validate=validate.OneOf(["admin", "user"]))
 
     @pre_load
     def strip_username(self, data: Dict[str, Any], **kwargs):

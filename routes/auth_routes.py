@@ -2,8 +2,8 @@ import os
 
 import bcrypt
 from dotenv import load_dotenv
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for
-from flask_jwt_extended import create_access_token
+from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
 from marshmallow import ValidationError
 
 from models import db, User
@@ -48,13 +48,14 @@ def register():
 
     username = payload["username"]
     password = payload["password"]
+    role = payload.get("role", "user")
 
     if User.query.filter_by(username=username).first():
         return jsonify({'message': 'User already exists'}), 409
 
     try:
         hashed_password, salt = hash_password(password)
-        new_user = User(username=username, password_hash=hashed_password, salt=salt)
+        new_user = User(username=username, password_hash=hashed_password, salt=salt, role=role)
         db.session.add(new_user)
         db.session.commit()
     except Exception as exc:
@@ -66,18 +67,32 @@ def register():
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return redirect(url_for("home_page"))
+        session.pop("role", None)
+        response = redirect(url_for("home_page"))
+        unset_jwt_cookies(response)
+        return response
 
-    data = request.get_json()
+    data = request.get_json() or {}
     username = data.get('username')
     password = data.get('password')
 
     user = User.query.filter_by(username=username).first()
     if not user:
-        return jsonify({'message': 'User not found'}), 404
+        session.pop("role", None)
+        response = jsonify({'message': 'User not found'})
+        response.status_code = 404
+        unset_jwt_cookies(response)
+        return response
 
     if verify_password(password, user.password_hash, user.salt):
         token = create_access_token(identity=username)
-        return jsonify({'message': 'Successful login', 'token': token}), 200
+        session["role"] = user.role
+        response = jsonify({'message': 'Successful login', 'token': token})
+        set_access_cookies(response, token)
+        return response
 
-    return jsonify({'message': 'Invalid password'}), 401
+    session.pop("role", None)
+    response = jsonify({'message': 'Invalid password'})
+    response.status_code = 401
+    unset_jwt_cookies(response)
+    return response

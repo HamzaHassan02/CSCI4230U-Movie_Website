@@ -1,7 +1,8 @@
 import os
+from functools import wraps
 
-from flask import Flask, render_template
-from flask_jwt_extended import JWTManager, jwt_required
+from flask import Flask, redirect, render_template, session, url_for
+from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from dotenv import load_dotenv
 
 from models import db
@@ -15,11 +16,19 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_TOKEN_LOCATION"] = ["cookies", "headers"]
+app.config["JWT_COOKIE_SECURE"] = False
+app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 
 db.init_app(app)
 
 jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
+
+
+@app.context_processor
+def inject_user_role():
+    return {"current_user_role": session.get("role")}
 
 
 # -----------------------
@@ -60,44 +69,55 @@ dummy_showtimes = [
     {"time": "8:00 PM", "available": 20},
 ]
 
-# -----------------------
-# Routes
-# -----------------------
+def login_required_view(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            verify_jwt_in_request()
+        except Exception:
+            return redirect(url_for("home_page"))
+        return fn(*args, **kwargs)
+
+    return wrapper
+
 
 @app.route("/")
 def home_page():
     return render_template("index.html")
 
 @app.route("/home")
+@login_required_view
 def home():
     return render_template("home.html", movies=dummy_movies)
 
 @app.route("/movie/<int:movie_id>")
+@login_required_view
 def movie_detail(movie_id):
     movie = next((m for m in dummy_movies if m["id"] == movie_id), None)
     return render_template("movie.html", movie=movie)
 
 @app.route("/booking/<int:movie_id>")
+@login_required_view
 def booking(movie_id):
     movie = next((m for m in dummy_movies if m["id"] == movie_id), None)
     return render_template("booking.html", movie=movie, showtimes=dummy_showtimes)
 
 @app.route("/my-bookings")
+@login_required_view
 def bookings():
     return render_template("bookings.html", bookings=dummy_bookings)
 
 @app.route("/admin")
-@jwt_required()
+@login_required_view
 def admin_dashboard():
+    if session.get("role") != "admin":
+        return redirect(url_for("home"))
     dummy_users = [
         {"username": "hamza", "booking_count": 3},
         {"username": "student", "booking_count": 1},
     ]
     return render_template("admin.html", users=dummy_users)
 
-# -----------------------
-# Run the app
-# -----------------------
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

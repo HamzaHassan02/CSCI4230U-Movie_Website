@@ -1,40 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
+{% extends 'base.html' %}
+{% set show_navbar = false %}
+{% block title %}Sign Up | MovieReservation{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <h1 class="auth-card__title">Sign Up</h1>
+  <form id="register-form" class="auth-card__form">
+    <label class="auth-card__label" for="username">Username</label>
+    <input class="auth-card__input" type="text" id="username" name="username" required>
 
-    <h2 class="register-title">Create an Account</h2>
-    <form id="register-form">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+    <label class="auth-card__label" for="password">Password</label>
+    <input class="auth-card__input" type="password" id="password" name="password" required>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+    <button type="submit" class="auth-card__button">Create Account</button>
+  </form>
+  <p id="register-message" class="auth-card__message"></p>
+  <p class="auth-card__footer">
+    Already a member?
+    <a href="{{ url_for('auth.login') }}">Sign in now</a>.
+  </p>
+</section>
+{% endblock %}
 
-        <button type="submit" class="register-button">Register</button>
-    </form>
-        <p id="register-message"></p>
-
-
-    <script>
-        const signupForm = document.getElementById('register-form'); // getting the signup form element
-        signupForm.addEventListener('submit', async (event) => { // adding submit event listener to the signup form
-        event.preventDefault(); // preventing the reloading of the page
-        const formData = new FormData(signupForm); // creating a FormData object from the form
-        const data = Object.fromEntries(formData); // converting FormData to a regular object
-        const response = await fetch('/register', { // sending POST request to the server
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data) // sending the signup data as JSON string
-        });
-        const result = await response.json(); // getting the JSON response and saving to result
-        document.getElementById('register-message').innerText = result.message; // displaying the signup message
+{% block scripts %}
+<script>
+  const registerUrl = "{{ url_for('auth.register') }}";
+  const signupForm = document.getElementById('register-form');
+  signupForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(signupForm);
+    const data = Object.fromEntries(formData);
+    const response = await fetch(registerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
     });
-    </script>
-</body>
-</html>
+    const result = await response.json();
+    const messageElement = document.getElementById('register-message');
+    if (response.ok) {
+      messageElement.innerText = result.message || 'Registration successful.';
+    } else {
+      const details = (result.errors || []).map(err => err.msg).join(' ');
+      const combinedMessage = [result.message, details].filter(Boolean).join(': ');
+      messageElement.innerText = combinedMessage || 'Registration failed.';
+    }
+  });
+</script>
+{% endblock %}

@@ -87,6 +87,67 @@ body {
   background: #3156c7;
 }
 
+/* ---------------- */
+/* Auth Card (BEM)  */
+/* ---------------- */
+.auth-card {
+  max-width: 360px;
+  margin: 80px auto;
+  padding: 35px;
+  background: white;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.auth-card__title {
+  margin: 0 0 20px;
+  font-size: 2rem;
+}
+
+.auth-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-card__label {
+  text-align: left;
+  font-weight: bold;
+}
+
+.auth-card__input {
+  padding: 12px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.auth-card__button {
+  padding: 12px;
+  background: #4169e1;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.auth-card__button:hover {
+  background: #3156c7;
+}
+
+.auth-card__message {
+  min-height: 20px;
+  margin-top: 10px;
+  color: #c0392b;
+}
+
+.auth-card__footer {
+  margin-top: 15px;
+}
+
 /* ------------------- */
 /* Movie List (Home)   */
 /* ------------------- */

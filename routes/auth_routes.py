@@ -4,8 +4,10 @@ import bcrypt
 from dotenv import load_dotenv
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 from flask_jwt_extended import create_access_token
+from marshmallow import ValidationError
 
 from models import db, User
+from schemas import register_schema
 
 load_dotenv()
 
@@ -35,12 +37,17 @@ def register():
     if request.method == "GET":
         return render_template("register_page.html")
 
-    data = request.get_json()
-    username = data.get("username")
-    password = data.get("password")
+    try:
+        payload = register_schema.load(request.get_json() or {})
+    except ValidationError as exc:
+        errors = []
+        for field, messages in (exc.messages or {}).items():
+            for message in messages:
+                errors.append({"field": field, "msg": message})
+        return jsonify({'message': 'Invalid input', 'errors': errors}), 400
 
-    if not username or not password:
-        return jsonify({"error": "Missing username or password"}), 400
+    username = payload["username"]
+    password = payload["password"]
 
     if User.query.filter_by(username=username).first():
         return jsonify({'message': 'User already exists'}), 409
@@ -67,7 +74,7 @@ def login():
 
     user = User.query.filter_by(username=username).first()
     if not user:
-        return jsonify({'message': 'User does not exist'}), 404
+        return jsonify({'message': 'User not found'}), 404
 
     if verify_password(password, user.password_hash, user.salt):
         token = create_access_token(identity=username)

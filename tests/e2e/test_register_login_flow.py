@@ -57,4 +57,4 @@ class AuthTests(BaseCase):
         self.click('button[type="submit"]')
 
         # Assert user does not exist message
-        self.assert_text("User does not exist", "body")
+        self.assert_text("User not found", "body")

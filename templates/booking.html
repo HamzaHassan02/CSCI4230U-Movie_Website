@@ -5,22 +5,60 @@
 <h2 class="booking__title">Booking — {{ movie.title }}</h2>
 <div class="booking-form">
 <label class="booking-form__label">Date:</label>
-<input type="date" class="booking-form__input">
+<input id="dateInput" type="date" class="booking-form__input">
 
 
 <label class="booking-form__label">Showtime:</label>
 <div class="booking-form__showtimes">
 {% for show in showtimes %}
-<button class="booking-form__showtime">{{ show.time }} ({{ show.available }} seats)</button>
+<button class="booking-form__showtime" data-time="{{ show.time }}" data-available="{{ show.available }}">
+  {{ show.time }} ({{ show.available }} seats)
+</button>
 {% endfor %}
 </div>
 
 
 <label class="booking-form__label">Quantity:</label>
-<input type="number" class="booking-form__input" min="1">
+<input id="quantityInput" type="number" class="booking-form__input" min="1">
 
 
-<button class="booking-form__button booking-form__button--confirm">Confirm Booking</button>
+<button class="booking-form__button booking-form__button--confirm" id="confirmBtn">Confirm Booking</button>
 <button class="booking-form__button booking-form__button--cancel" onclick="history.back()">Cancel</button>
 </div>
+<script>
+  let selectedShowtime = null;
+
+  // Handle selecting showtime
+  document.querySelectorAll('.booking-form__showtime').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedShowtime = {
+        time: btn.dataset.time,
+        available: btn.dataset.available
+      };
+
+      // Remove green from all showtime buttons
+      document.querySelectorAll('.booking-form__showtime').forEach(b => {
+        b.classList.remove('selected-showtime');
+      });
+
+      // Add green to the clicked button
+      btn.classList.add('selected-showtime');
+    });
+  });
+
+  // Handle Confirm button
+  document.getElementById('confirmBtn').addEventListener('click', () => {
+    const date = document.getElementById('dateInput').value;
+    const quantity = document.getElementById('quantityInput').value;
+
+    const bookingData = {
+      movie_title: "{{ movie.title }}",
+      date: date,
+      showtime: selectedShowtime,
+      quantity: Number(quantity)
+    };
+
+    console.log("JSON Booking data:", JSON.stringify(bookingData));
+  });
+</script>
 {% endblock %}

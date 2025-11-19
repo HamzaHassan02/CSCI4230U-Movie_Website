@@ -264,6 +264,11 @@ body {
   cursor: pointer;
 }
 
+.selected-showtime {
+  background-color: #4caf50 !important;
+  color: #fff !important;
+}
+
 .booking-form__button {
   width: 100%;
   padding: 12px;
@@ -347,4 +352,9 @@ body {
 .admin-user__button--danger {
   background: #ff6b6b;
   color: white;
+}
+
+.selected-showtime {
+  background-color: #4CAF50 !important;
+  color: white !important;
 }

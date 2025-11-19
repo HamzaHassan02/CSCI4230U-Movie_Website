@@ -20,7 +20,7 @@
 
     if (!token) {
         // If no token found, redirect to login page
-        window.location.href = "/login";
+        window.location.href = "{{ url_for('auth.login') }}";
     }
 
     console.log("Token loaded:", token);

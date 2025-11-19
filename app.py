@@ -1,4 +1,4 @@
-import os
+import os, requests
 from functools import wraps
 
 from flask import Flask, redirect, render_template, session, url_for
@@ -9,6 +9,9 @@ from models import db
 from routes.auth_routes import auth_bp
 
 load_dotenv()
+
+OMDB_API_KEY = "225f5d3d"
+OMDB_URL = "http://www.omdbapi.com/"
 
 app = Flask(__name__)
 # Configure SQLite Database
@@ -34,25 +37,28 @@ def inject_user_role():
 # -----------------------
 # Dummy Data (Temporary)
 # -----------------------
-dummy_poster = "/static/images/dummy_poster.png"
-dummy_movies = [
-    {
-        "id": 1,
-        "title": "Interstellar",
-        "poster_url": dummy_poster,
-        "director": "Christopher Nolan",
-        "genre": "Sci-Fi",
-        "rating": 8.6
-    },
-    {
-        "id": 2,
-        "title": "Inception",
-        "poster_url": dummy_poster,
-        "director": "Christopher Nolan",
-        "genre": "Action",
-        "rating": 8.8
+def get_movie_data(title):
+    params = {
+        "t": title,
+        "apikey": OMDB_API_KEY
     }
-]
+    response = requests.get(OMDB_URL, params=params)
+    return response.json()
+
+movies_to_fetch = ["Interstellar", "Inception"]
+dummy_movies = []
+
+for idx, title in enumerate(movies_to_fetch, 1):
+    data = get_movie_data(title)
+
+    dummy_movies.append({
+        "id": idx,
+        "title": data.get("Title"),
+        "poster_url": data.get("Poster"),
+        "director": data.get("Director"),
+        "genre": data.get("Genre"),
+        "rating": data.get("imdbRating")
+    })
 
 dummy_bookings = [
     {

@@ -2,25 +2,33 @@
 {% extends 'base.html' %}
 {% set show_navbar = true %}
 {% block content %}
-<h2 class="booking__title">Booking — {{ movie.title }}</h2>
-<div class="booking-form">
-<label class="booking-form__label">Date:</label>
-<input type="date" class="booking-form__input">
 
+<h1 class="booking__title">Booking — {{ movie.title }}</h1>
 
-<label class="booking-form__label">Showtime:</label>
-<div class="booking-form__showtimes">
-{% for show in showtimes %}
-<button class="booking-form__showtime">{{ show.time }} ({{ show.available }} seats)</button>
-{% endfor %}
+<div class="booking-details">
+    
+    <!-- Poster -->
+    <img class="booking-details__poster" src="{{ movie.poster_url }}">
+
+    <!-- Booking Form -->
+    <div class="booking-details__form">
+        <label class="booking-form__label">Date:</label>
+        <input type="date" class="booking-form__input">
+
+        <label class="booking-form__label" style="margin-top: 20px;">Showtime:</label>
+        <div class="booking-form__showtimes">
+            {% for s in showtimes %}
+            <button class="booking-form__showtime">{{ s.time }} ({{ s.available }} seats)</button>
+            {% endfor %}
+        </div>
+
+        <label class="booking-form__label" style="margin-top: 20px;">Quantity:</label>
+        <input type="number" class="booking-form__input" min="1">
+
+        <button class="booking-form__button booking-form__button--confirm">Confirm Booking</button>
+        <button class="booking-form__button booking-form__button--cancel">Cancel</button>
+    </div>
+
 </div>
 
-
-<label class="booking-form__label">Quantity:</label>
-<input type="number" class="booking-form__input" min="1">
-
-
-<button class="booking-form__button booking-form__button--confirm">Confirm Booking</button>
-<button class="booking-form__button booking-form__button--cancel" onclick="history.back()">Cancel</button>
-</div>
 {% endblock %}

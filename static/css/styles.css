@@ -199,10 +199,13 @@ body {
   display: flex;
   gap: 30px;
   padding: 40px;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .movie-details__poster {
-  width: 250px;
+  width: 280px;
   border-radius: 8px;
 }
 
@@ -219,6 +222,18 @@ body {
   border-radius: 5px;
   cursor: pointer;
 }
+
+.movie-details__plot {
+  max-width: 600px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.movie-details__info p {
+  margin: 5px 0;
+}
+
+
 
 /* -------------------- */
 /* Booking Form (BEM)   */
@@ -280,6 +295,26 @@ body {
 
 .booking-form__button--cancel {
   background: #ccc;
+}
+
+.booking-details {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 30px;
+  padding: 20px;
+}
+
+.booking-details__poster {
+  width: 260px;
+  border-radius: 8px;
+}
+
+.booking-details__form {
+  width: 320px;
+  background: white;
+  padding: 20px;
+  border-radius: 8
 }
 
 /* --------------------- */

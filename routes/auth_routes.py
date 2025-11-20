@@ -68,6 +68,7 @@ def register():
 def login():
     if request.method == "GET":
         session.pop("role", None)
+        session.pop("username", None)
         response = redirect(url_for("home_page"))
         unset_jwt_cookies(response)
         return response
@@ -87,11 +88,13 @@ def login():
     if verify_password(password, user.password_hash, user.salt):
         token = create_access_token(identity=username)
         session["role"] = user.role
+        session["username"] = user.username
         response = jsonify({'message': 'Successful login', 'token': token})
         set_access_cookies(response, token)
         return response
 
     session.pop("role", None)
+    session.pop("username", None)
     response = jsonify({'message': 'Invalid password'})
     response.status_code = 401
     unset_jwt_cookies(response)

@@ -1,0 +1,38 @@
+<!-- Base template -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}MovieReservation{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+
+{% if show_navbar %}
+<nav class="navbar">
+<a class="navbar__logo" href="{{ url_for('home') }}">
+    <img src="{{ url_for('static', filename='images/Website_Logo.png') }}" 
+         alt="FlickBook Logo" 
+         class="navbar__logo-img">
+</a>
+<ul class="navbar__links">
+<li class="navbar__item"><a class="navbar__link" href="{{ url_for('home') }}">Home</a></li>
+<li class="navbar__item"><a class="navbar__link" href="{{ url_for('bookings') }}">My Bookings</a></li>
+{% if current_user_role == 'admin' %}
+<li class="navbar__item"><a class="navbar__link" href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+{% endif %}
+<li class="navbar__item"><a class="navbar__link navbar__link--logout" href="{{ url_for('auth.login') }}">Logout</a></li>
+</ul>
+</nav>
+{% endif %}
+
+
+<div class="page">
+{% block content %}{% endblock %}
+</div>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

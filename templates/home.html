@@ -1,0 +1,27 @@
+<!-- home.html (Movie listings) -->
+{% extends 'base.html' %}
+{% set show_navbar = true %}
+{% block title %}Home | MovieReservation{% endblock %}
+{% block content %}
+<h1 class="movie-list__title">Now Showing</h1>
+<div class="movie-list">
+{% for movie in movies %}
+<a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="movie-card">
+  <img class="movie-card__poster" src="{{ movie.poster_url }}">
+  <h3 class="movie-card__title">{{ movie.title }}</h3>
+</a>
+{% endfor %}
+</div>
+{% endblock %}
+
+<script>
+    // Get token from browser storage
+    const token = localStorage.getItem("jwt");
+
+    if (!token) {
+        // If no token found, redirect to login page
+        window.location.href = "{{ url_for('auth.login') }}";
+    }
+
+    console.log("Token loaded:", token);
+</script>

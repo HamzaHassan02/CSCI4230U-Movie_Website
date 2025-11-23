@@ -1,0 +1,161 @@
+<!-- booking.html -->
+{% extends 'base.html' %}
+{% set show_navbar = true %}
+{% block content %}
+
+<h1 class="booking__title">Booking — {{ movie.title }}</h1>
+
+<div class="booking-details">
+    
+    <!-- Poster -->
+    <img class="booking-details__poster" src="{{ movie.poster_url }}">
+
+    <!-- Booking Form -->
+    <div class="booking-details__form">
+        <label class="booking-form__label">Date:</label>
+        <input id="dateInput" type="date" class="booking-form__input">
+
+        <label class="booking-form__label" style="margin-top: 20px;">Showtime:</label>
+        <div class="booking-form__showtimes">
+            {% for show in showtimes %}
+            <button class="booking-form__showtime" data-time="{{ show.time }}" data-available="{{ show.available }}">{{ show.time }} ({{ show.available }} seats)</button>
+            {% endfor %}
+        </div>
+
+        <label class="booking-form__label" style="margin-top: 20px;">Quantity:</label>
+        <input id="quantityInput" type="number" class="booking-form__input" min="1">
+
+        <button class="booking-form__button booking-form__button--confirm" id="confirmBtn">Confirm Booking</button>
+        <button class="booking-form__button booking-form__button--cancel">Cancel</button>
+        <p class="booking-form__message" id="bookingMessage"></p>
+    </div>
+
+</div>
+
+<script>
+  const currentUser = {{ (current_username or "") | tojson }};
+  const existingBooking = {{ existing_booking | tojson | default('null') }};
+  const isEditMode = Boolean(existingBooking && existingBooking.id);
+  let selectedShowtime = null;
+
+  const dateInput = document.getElementById('dateInput');
+  const quantityInput = document.getElementById('quantityInput');
+  const messageEl = document.getElementById('bookingMessage');
+  const confirmBtn = document.getElementById('confirmBtn');
+
+  // Handle selecting showtime
+  document.querySelectorAll('.booking-form__showtime').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedShowtime = {
+        time: btn.dataset.time,
+        available: Number(btn.dataset.available)
+      };
+
+      // Remove green from all showtime buttons
+      document.querySelectorAll('.booking-form__showtime').forEach(b => {
+        b.classList.remove('selected-showtime');
+      });
+
+      // Add green to the clicked button
+      btn.classList.add('selected-showtime');
+    });
+  });
+
+  if (isEditMode) {
+    confirmBtn.textContent = 'Update Booking';
+    if (existingBooking.show_date) {
+      dateInput.value = existingBooking.show_date;
+    }
+    if (existingBooking.quantity) {
+      quantityInput.value = existingBooking.quantity;
+    }
+    if (existingBooking.showtime) {
+      const matchingBtn = Array.from(document.querySelectorAll('.booking-form__showtime')).find(btn => btn.dataset.time === existingBooking.showtime);
+      if (matchingBtn) {
+        matchingBtn.classList.add('selected-showtime');
+        selectedShowtime = {
+          time: matchingBtn.dataset.time,
+          available: Number(matchingBtn.dataset.available)
+        };
+      } else {
+        selectedShowtime = {
+          time: existingBooking.showtime,
+          available: null
+        };
+      }
+    }
+  }
+
+  // Handle Confirm button
+  confirmBtn.addEventListener('click', async () => {
+    const date = dateInput.value;
+    const quantityValue = quantityInput.value;
+    const quantity = Number(quantityValue);
+    messageEl.textContent = '';
+
+    if (!currentUser) {
+      messageEl.textContent = 'Unable to determine current user. Please log in again.';
+      return;
+    }
+
+    if (!date) {
+      messageEl.textContent = 'Please select a date before booking.';
+      return;
+    }
+
+    if (!selectedShowtime) {
+      messageEl.textContent = 'Please choose a showtime.';
+      return;
+    }
+
+    if (!quantity || quantity <= 0) {
+      messageEl.textContent = 'Please enter a valid quantity.';
+      return;
+    }
+
+    const payload = {
+      date,
+      showtime: selectedShowtime,
+      quantity
+    };
+
+    const isCreateMode = !isEditMode;
+    const url = isCreateMode ? '/api/bookings' : `/api/bookings/${existingBooking.id}`;
+    const method = isCreateMode ? 'POST' : 'PATCH';
+
+    if (isCreateMode) {
+      payload.movie_title = "{{ movie.title }}";
+      payload.user = currentUser;
+    }
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        const errorMsg = Array.isArray(result.errors) ? result.errors.join(', ') : result.message;
+        messageEl.textContent = `Booking failed: ${errorMsg}`;
+        return;
+      }
+
+      messageEl.textContent = isCreateMode ? 'Booking saved successfully!' : 'Booking updated successfully!';
+
+      if (!isCreateMode) {
+        setTimeout(() => {
+          window.location.href = '/my-bookings';
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Failed to save booking', error);
+      messageEl.textContent = 'Unexpected error while saving booking. Please try again.';
+    }
+  });
+</script>
+{% endblock %}

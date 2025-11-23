@@ -1,0 +1,97 @@
+<!-- bookings.html -->
+{% extends 'base.html' %}
+{% set show_navbar = true %}
+{% block content %}
+<h1 class="bookings__title">My Bookings</h1>
+<p class="bookings__message" id="bookingsMessage"></p>
+<div class="bookings" id="bookingList" data-empty-message="No bookings found for {{ username or 'this account' }}.">
+{% if bookings %}
+  {% for b in bookings %}
+  <div class="booking-card" data-booking-id="{{ b.id }}">
+    <h3 class="booking-card__title">{{ b.movie_title }}</h3>
+    <p class="booking-card__info" data-booking-field="datetime">{{ b.show_date }} — {{ b.showtime }}</p>
+    <p class="booking-card__info" data-booking-field="quantity">Seats: {{ b.quantity }}</p>
+    <p class="booking-card__info booking-card__info--user">Booked by: {{ b.booked_by }}</p>
+    <div class="booking-card__actions">
+      <a class="booking-card__button booking-card__button--edit" href="{{ url_for('edit_booking', booking_id=b.id) }}">Update</a>
+      <button class="booking-card__button booking-card__button--cancel" data-booking-id="{{ b.id }}">Cancel</button>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p class="booking-card__empty">No bookings found for {{ username or 'this account' }}.</p>
+{% endif %}
+{% if bookings_payload is defined %}
+<script>
+  const bookingsData = {{ bookings_payload | tojson | safe }};
+  const currentUsername = {{ (username or "") | tojson }};
+  const bookingsMessage = document.getElementById('bookingsMessage');
+  const bookingListEl = document.getElementById('bookingList');
+
+  const setBookingsMessage = (text, timeoutMs = 0) => {
+    if (!bookingsMessage) return;
+    bookingsMessage.textContent = text || '';
+    if (timeoutMs > 0 && text) {
+      setTimeout(() => {
+        if (bookingsMessage.textContent === text) {
+          bookingsMessage.textContent = '';
+        }
+      }, timeoutMs);
+    }
+  };
+
+  if (bookingsData.length > 0) {
+    console.log('Sample booking:', bookingsData[0]);
+  } else {
+    console.log('No bookings available to display.');
+  }
+
+  document.querySelectorAll('.booking-card__button--cancel').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const bookingId = btn.dataset.bookingId;
+      if (!bookingId) {
+        setBookingsMessage('Unable to determine booking id.');
+        return;
+      }
+
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Cancelling...';
+
+      try {
+        const response = await fetch(`/api/bookings/${bookingId}`, {
+          method: 'DELETE'
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          btn.disabled = false;
+          btn.textContent = originalText;
+          setBookingsMessage(result.message || 'Failed to cancel booking.');
+          return;
+        }
+
+        const bookingCard = btn.closest('.booking-card');
+        if (bookingCard) {
+          bookingCard.remove();
+        }
+        setBookingsMessage('Booking cancelled successfully.', 4000);
+
+        if (bookingListEl && !bookingListEl.querySelector('.booking-card')) {
+          const emptyEl = document.createElement('p');
+          emptyEl.className = 'booking-card__empty';
+          emptyEl.textContent = bookingListEl.dataset.emptyMessage || `No bookings found for ${currentUsername || 'this account'}.`;
+          bookingListEl.appendChild(emptyEl);
+        }
+      } catch (error) {
+        console.error('Failed to cancel booking', error);
+        btn.disabled = false;
+        btn.textContent = originalText;
+        setBookingsMessage('Unexpected error while cancelling booking.');
+      }
+    });
+  });
+</script>
+{% endif %}
+</div>
+{% endblock %}

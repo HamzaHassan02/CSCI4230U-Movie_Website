@@ -3,15 +3,26 @@
 {% set show_navbar = false %}
 {% block title %}Login | MovieReservation{% endblock %}
 {% block content %}
-<div class="login">
-<h2 class="login__title">Welcome to MovieReservation</h2>
-<form id="landing-login-form" class="login__form">
-  <input class="login__input" type="text" name="username" placeholder="Username" required>
-  <input class="login__input" type="password" name="password" placeholder="Password" required>
-  <button class="login__button" type="submit">Login</button>
-</form>
-<p class="login__message" id="landing-login-message"></p>
-<p>Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
+<div class="auth-wrapper">
+    
+    <div class="auth-logo">
+        <img src="{{ url_for('static', filename='images/Website_Logo.png') }}"
+             alt="FlickBook Logo" class="auth-logo__img">
+    </div>
+
+    <div class="login">
+        <h2 class="login__title">Welcome</h2>
+        <form id="landing-login-form" class="login__form">
+            <input class="login__input" type="text" name="username" placeholder="Username" required>
+            <input class="login__input" type="password" name="password" placeholder="Password" required>
+            <button class="login__button" type="submit">Login</button>
+        </form>
+
+        <p class="login__message" id="landing-login-message"></p>
+
+        <p>Don't have an account?<br> <a href="{{ url_for('auth.register') }}">Register here</a></p>
+    </div>
+
 </div>
 {% endblock %}
 

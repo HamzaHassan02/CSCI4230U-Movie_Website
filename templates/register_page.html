@@ -2,23 +2,31 @@
 {% set show_navbar = false %}
 {% block title %}Sign Up | MovieReservation{% endblock %}
 {% block content %}
-<section class="auth-card">
-  <h1 class="auth-card__title">Sign Up</h1>
-  <form id="register-form" class="auth-card__form">
-    <label class="auth-card__label" for="username">Username</label>
-    <input class="auth-card__input" type="text" id="username" name="username" required>
+<div class="auth-wrapper">
+  <div class="auth-logo">
+        <img src="{{ url_for('static', filename='images/Website_Logo.png') }}"
+             alt="FlickBook Logo" class="auth-logo__img">
+    </div>
 
-    <label class="auth-card__label" for="password">Password</label>
-    <input class="auth-card__input" type="password" id="password" name="password" required>
+  <section class="auth-card">
+    <h1 class="auth-card__title">Sign Up</h1>
+    <form id="register-form" class="auth-card__form">
+      <label class="auth-card__label" for="username">Username</label>
+      <input class="auth-card__input" type="text" id="username" name="username" required>
+  
+      <label class="auth-card__label" for="password">Password</label>
+      <input class="auth-card__input" type="password" id="password" name="password" required>
+  
+      <button type="submit" class="auth-card__button">Create Account</button>
+    </form>
+    <p id="register-message" class="auth-card__message"></p>
+    <p class="auth-card__footer">
+      Already a member?
+      <a href="{{ url_for('auth.login') }}">Sign in now</a>.
+    </p>
+  </section>
+</div>
 
-    <button type="submit" class="auth-card__button">Create Account</button>
-  </form>
-  <p id="register-message" class="auth-card__message"></p>
-  <p class="auth-card__footer">
-    Already a member?
-    <a href="{{ url_for('auth.login') }}">Sign in now</a>.
-  </p>
-</section>
 {% endblock %}
 
 {% block scripts %}

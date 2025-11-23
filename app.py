@@ -52,19 +52,40 @@ def get_movie_data(title):
     response = requests.get(OMDB_URL, params=params)
     return response.json()
 
-movies_to_fetch = ["Interstellar", "Inception"]
+movies_to_fetch = [
+    "Interstellar",
+    "Inception",
+    "The Dark Knight",
+    "Avatar",
+    "Avengers: Endgame",
+    "Oppenheimer",
+    "Bullet Train",
+    "The Matrix",
+    "The Shawshank Redemption",
+    "Pulp Fiction",
+    "The Lord of the Rings: The Fellowship of the Ring",
+    "Spider-Man: No Way Home",
+    "Joker",
+    "Guardians of the Galaxy"
+]
+
 dummy_movies = []
 
 for idx, title in enumerate(movies_to_fetch, 1):
     data = get_movie_data(title)
 
     dummy_movies.append({
-        "id": idx,
+        "id": data.get("imdbID"),
         "title": data.get("Title"),
         "poster_url": data.get("Poster"),
         "director": data.get("Director"),
+        "studio": data.get("Production"),
         "genre": data.get("Genre"),
-        "rating": data.get("imdbRating")
+        "rating": data.get("imdbRating"),
+        "runtime": data.get("Runtime"),
+        "actors": data.get("Actors"),
+        "plot": data.get("Plot"),
+        "released": data.get("Released"),
     })
 
 dummy_bookings = [
@@ -103,13 +124,13 @@ def home_page():
 def home():
     return render_template("home.html", movies=dummy_movies)
 
-@app.route("/movie/<int:movie_id>")
+@app.route("/movie/<movie_id>")
 @login_required_view
 def movie_detail(movie_id):
     movie = next((m for m in dummy_movies if m["id"] == movie_id), None)
     return render_template("movie.html", movie=movie)
 
-@app.route("/booking/<int:movie_id>")
+@app.route("/booking/<movie_id>")
 @login_required_view
 def booking(movie_id):
     movie = next((m for m in dummy_movies if m["id"] == movie_id), None)

@@ -2,30 +2,36 @@
 {% extends 'base.html' %}
 {% set show_navbar = true %}
 {% block content %}
-<h2 class="booking__title">Booking — {{ movie.title }}</h2>
-<div class="booking-form">
-<label class="booking-form__label">Date:</label>
-<input id="dateInput" type="date" class="booking-form__input">
 
+<h1 class="booking__title">Booking — {{ movie.title }}</h1>
 
-<label class="booking-form__label">Showtime:</label>
-<div class="booking-form__showtimes">
-{% for show in showtimes %}
-<button class="booking-form__showtime" data-time="{{ show.time }}" data-available="{{ show.available }}">
-  {{ show.time }} ({{ show.available }} seats)
-</button>
-{% endfor %}
+<div class="booking-details">
+    
+    <!-- Poster -->
+    <img class="booking-details__poster" src="{{ movie.poster_url }}">
+
+    <!-- Booking Form -->
+    <div class="booking-details__form">
+        <label class="booking-form__label">Date:</label>
+        <input id="dateInput" type="date" class="booking-form__input">
+
+        <label class="booking-form__label" style="margin-top: 20px;">Showtime:</label>
+        <div class="booking-form__showtimes">
+            {% for show in showtimes %}
+            <button class="booking-form__showtime" data-time="{{ show.time }}" data-available="{{ show.available }}">{{ show.time }} ({{ show.available }} seats)</button>
+            {% endfor %}
+        </div>
+
+        <label class="booking-form__label" style="margin-top: 20px;">Quantity:</label>
+        <input id="quantityInput" type="number" class="booking-form__input" min="1">
+
+        <button class="booking-form__button booking-form__button--confirm" id="confirmBtn">Confirm Booking</button>
+        <button class="booking-form__button booking-form__button--cancel">Cancel</button>
+        <p class="booking-form__message" id="bookingMessage"></p>
+    </div>
+
 </div>
 
-
-<label class="booking-form__label">Quantity:</label>
-<input id="quantityInput" type="number" class="booking-form__input" min="1">
-
-
-<button class="booking-form__button booking-form__button--confirm" id="confirmBtn">Confirm Booking</button>
-<button class="booking-form__button booking-form__button--cancel" onclick="history.back()">Cancel</button>
-<p class="booking-form__message" id="bookingMessage"></p>
-</div>
 <script>
   const currentUser = {{ (current_username or "") | tojson }};
   const existingBooking = {{ existing_booking | tojson | default('null') }};

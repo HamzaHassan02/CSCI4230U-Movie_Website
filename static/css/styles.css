@@ -48,9 +48,39 @@ body {
   color: #ff6b6b;
 }
 
+.navbar__logo-img {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    
+    /* Make logo lighter */
+    filter: brightness(2.5) drop-shadow(0 0 1px rgba(143, 142, 142, 0.9));
+
+} 
+
 /* ---------------- */
 /* Login Page (BEM) */
 /* ---------------- */
+/* Page wrapper – centers everything */
+.auth-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px; 
+}
+
+/* Logo above form */
+.auth-logo {
+    margin-bottom: 0px; /* reduce space between logo and form */
+}
+
+.auth-logo__img {
+    width: 500px;          
+    height: auto;
+    filter: brightness(2.5);
+}
+
 .login {
   width: 320px;
   margin: 100px auto;

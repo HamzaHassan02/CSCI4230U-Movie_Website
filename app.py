@@ -5,8 +5,9 @@ from flask import Flask, redirect, render_template, session, url_for
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from dotenv import load_dotenv
 
-from models import db
+from models import Booking, db
 from routes.auth_routes import auth_bp
+from routes.booking_routes import booking_bp
 
 load_dotenv()
 
@@ -27,11 +28,17 @@ db.init_app(app)
 
 jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
+app.register_blueprint(booking_bp)
 
+with app.app_context():
+    db.create_all()
 
 @app.context_processor
-def inject_user_role():
-    return {"current_user_role": session.get("role")}
+def inject_user_context():
+    return {
+        "current_user_role": session.get("role"),
+        "current_username": session.get("username"),
+    }
 
 
 # -----------------------
@@ -127,12 +134,70 @@ def movie_detail(movie_id):
 @login_required_view
 def booking(movie_id):
     movie = next((m for m in dummy_movies if m["id"] == movie_id), None)
-    return render_template("booking.html", movie=movie, showtimes=dummy_showtimes)
+    return render_template("booking.html", movie=movie, showtimes=dummy_showtimes, existing_booking=None)
+
+
+@app.route("/booking/edit/<int:booking_id>")
+@login_required_view
+def edit_booking(booking_id):
+    username = session.get("username")
+    if not username:
+        return redirect(url_for("auth.login"))
+
+    booking_record = Booking.query.get_or_404(booking_id)
+    if booking_record.booked_by != username:
+        return redirect(url_for("bookings"))
+
+    movie = next((m for m in dummy_movies if m["title"] == booking_record.movie_title), None)
+    if not movie:
+        movie = {
+            "id": 0,
+            "title": booking_record.movie_title,
+            "poster_url": "",
+            "director": "",
+            "genre": "",
+            "rating": "",
+        }
+
+    existing_booking = {
+        "id": booking_record.id,
+        "show_date": booking_record.show_date,
+        "showtime": booking_record.showtime,
+        "quantity": booking_record.quantity,
+    }
+
+    return render_template("booking.html", movie=movie, showtimes=dummy_showtimes, existing_booking=existing_booking)
 
 @app.route("/my-bookings")
 @login_required_view
 def bookings():
-    return render_template("bookings.html", bookings=dummy_bookings)
+    username = session.get("username")
+    if not username:
+        return redirect(url_for("auth.login"))
+
+    user_bookings = (
+        Booking.query.filter_by(booked_by=username)
+        .order_by(Booking.created_at.desc())
+        .all()
+    )
+    booking_payload = [
+        {
+            "id": b.id,
+            "movie_title": b.movie_title,
+            "show_date": b.show_date,
+            "showtime": b.showtime,
+            "quantity": b.quantity,
+            "booked_by": b.booked_by,
+            "created_at": b.created_at.isoformat() if b.created_at else None,
+        }
+        for b in user_bookings
+    ]
+    return render_template(
+        "bookings.html",
+        bookings=user_bookings,
+        username=username,
+        bookings_payload=booking_payload,
+    )
 
 @app.route("/admin")
 @login_required_view

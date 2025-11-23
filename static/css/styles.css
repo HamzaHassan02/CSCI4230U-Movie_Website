@@ -264,6 +264,11 @@ body {
   cursor: pointer;
 }
 
+.selected-showtime {
+  background-color: #4caf50 !important;
+  color: #fff !important;
+}
+
 .booking-form__button {
   width: 100%;
   padding: 12px;
@@ -282,12 +287,26 @@ body {
   background: #ccc;
 }
 
+.booking-form__message {
+  min-height: 20px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #444;
+}
+
 /* --------------------- */
 /* My Bookings (BEM)     */
 /* --------------------- */
 .bookings__title {
   text-align: center;
   margin-top: 20px;
+}
+
+.bookings__message {
+  text-align: center;
+  min-height: 20px;
+  color: #ff6b6b;
 }
 
 .bookings {
@@ -311,9 +330,31 @@ body {
   cursor: pointer;
 }
 
+.booking-card__button--edit {
+  background: #4caf50;
+  color: white;
+}
+
 .booking-card__button--cancel {
   background: #ff6b6b;
   color: white;
+}
+
+.booking-card__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.booking-card__info--user {
+  font-style: italic;
+  color: #555;
+}
+
+.booking-card__empty {
+  text-align: center;
+  color: #666;
+  margin-top: 30px;
 }
 
 /* ---------------------- */
@@ -347,4 +388,9 @@ body {
 .admin-user__button--danger {
   background: #ff6b6b;
   color: white;
+}
+
+.selected-showtime {
+  background-color: #4CAF50 !important;
+  color: white !important;
 }

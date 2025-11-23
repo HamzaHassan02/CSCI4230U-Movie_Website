@@ -6,10 +6,11 @@
 }
 
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  color: #222;
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #222 0%, #294daf 100%);
+    background-attachment: fixed;   /* makes gradient smooth even while scrolling */
+    font-family: Arial, sans-serif;
 }
 
 /* ------------- */
@@ -182,6 +183,7 @@ body {
 /* Movie List (Home)   */
 /* ------------------- */
 .movie-list__title {
+  color: white;
   text-align: center;
   margin: 30px 0;
 }
@@ -241,6 +243,7 @@ body {
 
 .movie-details__info {
   max-width: 500px;
+  color: white;
 }
 
 .movie-details__button {
@@ -271,6 +274,7 @@ body {
 .booking__title {
   text-align: center;
   margin-top: 20px;
+  color: white;
 }
 
 .booking-form {
@@ -353,6 +357,7 @@ body {
 .bookings__title {
   text-align: center;
   margin-top: 20px;
+  color: white;
 }
 
 .bookings {

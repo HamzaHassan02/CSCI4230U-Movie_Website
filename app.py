@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from models import Booking, db
 from routes.auth_routes import auth_bp
 from routes.booking_routes import booking_bp
+from routes.user_routes import user_bp
 from models import User
 
 load_dotenv()
@@ -30,6 +31,7 @@ db.init_app(app)
 jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(booking_bp)
+app.register_blueprint(user_bp)
 
 with app.app_context():
     db.create_all()

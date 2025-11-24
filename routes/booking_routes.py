@@ -82,17 +82,46 @@ def post_booking():
     )
 
 
+@booking_bp.route("/api/bookings", methods=["GET"])
+def list_bookings():
+    # Only admins can view all bookings
+    if session.get("role") != "admin":
+        return jsonify({"message": "Admin access required"}), 403
+
+    bookings = (
+        Booking.query.order_by(Booking.created_at.desc())
+        if hasattr(Booking, "created_at")
+        else Booking.query.all()
+    )
+    payload = [
+        {
+            "id": b.id,
+            "movie_title": b.movie_title,
+            "date": b.show_date,
+            "showtime": b.showtime,
+            "quantity": b.quantity,
+            "user": b.booked_by,
+            "created_at": b.created_at.isoformat() if getattr(b, "created_at", None) else None,
+        }
+        for b in bookings
+    ]
+    return jsonify({"bookings": payload})
+
+
 @booking_bp.route("/api/bookings/<int:booking_id>", methods=["PATCH"])
 def update_booking(booking_id: int):
     # Update fields on a booking owned by the current user
     username = session.get("username")
+    role = session.get("role")
+    is_admin = role == "admin"
+
     if not username:
         return jsonify({"message": "Authentication required"}), 401
 
     booking = Booking.query.get(booking_id)
     if not booking:
         return jsonify({"message": "Booking not found"}), 404
-    if booking.booked_by != username:
+    if not is_admin and booking.booked_by != username:
         return jsonify({"message": "Not authorized to update this booking"}), 403
 
     payload = request.get_json() or {}
@@ -156,13 +185,16 @@ def update_booking(booking_id: int):
 def delete_booking(booking_id: int):
     # Delete a booking owned by the current session user
     username = session.get("username")
+    role = session.get("role")
+    is_admin = role == "admin"
+
     if not username:
         return jsonify({"message": "Authentication required"}), 401
 
     booking = Booking.query.get(booking_id)
     if not booking:
         return jsonify({"message": "Booking not found"}), 404
-    if booking.booked_by != username:
+    if not is_admin and booking.booked_by != username:
         return jsonify({"message": "Not authorized to cancel this booking"}), 403
 
     try:

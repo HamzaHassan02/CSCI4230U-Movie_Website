@@ -150,7 +150,11 @@
       if (!isCreateMode) {
         setTimeout(() => {
           window.location.href = '/my-bookings';
-        }, 1500);
+        }, 150);
+      } else {
+        setTimeout(() => {
+          window.location.href = '/my-bookings';
+        }, 100);
       }
     } catch (error) {
       console.error('Failed to save booking', error);

@@ -120,7 +120,7 @@
     };
 
     const isCreateMode = !isEditMode;
-    const url = isCreateMode ? '/api/bookings' : `/api/bookings/${existingBooking.id}`;
+    const url = isCreateMode ? '/api/bookings/checkout' : `/api/bookings/${existingBooking.id}`;
     const method = isCreateMode ? 'POST' : 'PATCH';
 
     if (isCreateMode) {
@@ -145,17 +145,20 @@
         return;
       }
 
-      messageEl.textContent = isCreateMode ? 'Booking saved successfully!' : 'Booking updated successfully!';
-
-      if (!isCreateMode) {
-        setTimeout(() => {
-          window.location.href = '/my-bookings';
-        }, 150);
-      } else {
-        setTimeout(() => {
-          window.location.href = '/my-bookings';
-        }, 100);
+      if (isCreateMode) {
+        if (!result.checkout_url) {
+          messageEl.textContent = 'Unable to start checkout. Please try again.';
+          return;
+        }
+        messageEl.textContent = 'Redirecting to payment...';
+        window.location.href = result.checkout_url;
+        return;
       }
+
+      messageEl.textContent = 'Booking updated successfully!';
+      setTimeout(() => {
+        window.location.href = '/my-bookings';
+      }, 150);
     } catch (error) {
       console.error('Failed to save booking', error);
       messageEl.textContent = 'Unexpected error while saving booking. Please try again.';

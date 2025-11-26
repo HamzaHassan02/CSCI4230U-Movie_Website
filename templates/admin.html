@@ -4,13 +4,20 @@
 {% block content %}
 <h1 class="admin__title">Admin Dashboard</h1>
 <div class="admin">
-{% for user in users %}
-<div class="admin-user">
-<h3 class="admin-user__name">{{ user.username }}</h3>
-<p class="admin-user__count">Bookings: {{ user.booking_count }}</p>
-<button class="admin-user__button">Edit Bookings</button>
-<button class="admin-user__button admin-user__button--danger">Remove User</button>
-</div>
-{% endfor %}
+
+    <div class="admin-actions">
+        <a class="admin-actions__button" href="{{ url_for('manage_movies') }}">
+            Manage Movies
+        </a>
+    </div>
+
+    {% for user in users %}
+    <div class="admin-user">
+        <h3 class="admin-user__name">{{ user.username }}</h3>
+        <p class="admin-user__count">Bookings: {{ user.booking_count }}</p>
+        <button class="admin-user__button">Edit Bookings</button>
+        <button class="admin-user__button admin-user__button--danger">Remove User</button>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

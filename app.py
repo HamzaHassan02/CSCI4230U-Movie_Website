@@ -210,6 +210,17 @@ def admin_dashboard():
     ]
     return render_template("admin.html", users=dummy_users)
 
+@app.route("/admin/manage-movies")
+@login_required_view
+def manage_movies():
+    # Only admin allowed
+    if session.get("role") != "admin":
+        return redirect(url_for("home"))
+
+    movies = [] # for db 
+
+    return render_template("manage_movies.html", movies=movies)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

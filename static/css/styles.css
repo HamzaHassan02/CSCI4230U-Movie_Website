@@ -433,12 +433,33 @@ body {
 .admin__title {
   text-align: center;
   margin-top: 20px;
+  color: white;
 }
 
 .admin {
   width: 90%;
   max-width: 700px;
   margin: 20px auto;
+}
+
+.admin-actions {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.admin-actions__button {
+    background: #0077ff;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s ease-in-out;
+}
+
+.admin-actions__button:hover {
+    background: #005fcc;
 }
 
 .admin-user {
@@ -459,6 +480,23 @@ body {
   background: #ff6b6b;
   color: white;
 }
+
+/* ---------------------- */
+/* Manage Movies (BEM)  */
+/* ---------------------- */
+.manage-movies__title {
+    text-align: center;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.manage-movies__subtitle {
+    text-align: center;
+    margin-bottom: 30px;
+    opacity: 0.8;
+    color: lightgray;
+}
+
 
 .selected-showtime {
   background-color: #4CAF50 !important;

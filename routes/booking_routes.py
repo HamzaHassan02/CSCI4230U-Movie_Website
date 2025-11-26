@@ -108,12 +108,15 @@ def list_bookings():
     return jsonify({"bookings": payload})
 
 
-@booking_bp.route("/api/bookings/<int:booking_id>", methods=["PATCH"])
-def update_booking(booking_id: int):
+@booking_bp.route("/api/bookings/<int:booking_id>", methods=["PUT"])
+def update_booking(booking_id):
     # Update fields on a booking owned by the current user
     username = session.get("username")
     role = session.get("role")
-    is_admin = role == "admin"
+    if role == "admin":
+        is_admin = True
+    else:
+        is_admin = False
 
     if not username:
         return jsonify({"message": "Authentication required"}), 401

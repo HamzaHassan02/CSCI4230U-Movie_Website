@@ -29,6 +29,8 @@ SECRET_KEY=your_flask_secret_key
 JWT_SECRET_KEY=your_jwt_secret_key
 PEPPER=your_pepper_value
 DATABASE_URL=sqlite:///database.db
+STRIPE_SECRET_KEY= 
+TICKET_PRICE_CENTS=1300
 ```
 
 4. Start app

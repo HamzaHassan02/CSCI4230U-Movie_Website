@@ -1,7 +1,7 @@
 import os, requests
 from functools import wraps
 
-from flask import Flask, redirect, render_template, session, url_for
+from flask import Flask, redirect, render_template, session, url_for, request
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from dotenv import load_dotenv
 
@@ -210,6 +210,7 @@ def admin_dashboard():
     ]
     return render_template("admin.html", users=dummy_users)
 
+admin_movie_list = []
 @app.route("/admin/manage-movies")
 @login_required_view
 def manage_movies():
@@ -217,9 +218,64 @@ def manage_movies():
     if session.get("role") != "admin":
         return redirect(url_for("home"))
 
-    movies = [] # for db 
+    return render_template("manage_movies.html", movies=admin_movie_list)
 
-    return render_template("manage_movies.html", movies=movies)
+@app.route("/admin/search-movies", methods=["GET"])
+@login_required_view
+def search_movies():
+    if session.get("role") != "admin":
+        return {"error": "Unauthorized"}, 403
+
+    query = request.args.get("q", "")
+    if not query:
+        return {"error": "Missing query"}, 400
+
+    url = f"http://www.omdbapi.com/?apikey={OMDB_API_KEY}&s={query}&type=movie"
+    res = requests.get(url).json()
+
+    if res.get("Response") == "False":
+        return {"results": []}
+
+    return {"results": res.get("Search", [])}
+
+@app.route("/admin/add-movie", methods=["POST"])
+@login_required_view
+def add_movie():
+    if session.get("role") != "admin":
+        return {"error": "Unauthorized"}, 403
+
+    data = request.json
+    imdb_id = data.get("imdb_id")
+    title = data.get("title")
+    year = data.get("year")
+    poster = data.get("poster")
+
+    # Prevent duplicates
+    if any(m["imdb_id"] == imdb_id for m in admin_movie_list):
+        return {"message": "Already added"}
+
+    admin_movie_list.append({
+        "imdb_id": imdb_id,
+        "title": title,
+        "year": year,
+        "poster": poster
+    })
+
+    return {"message": "Movie added", "movies": admin_movie_list}
+
+@app.route("/admin/remove-movie", methods=["POST"])
+@login_required_view
+def remove_movie():
+    if session.get("role") != "admin":
+        return {"error": "Unauthorized"}, 403
+
+    data = request.json
+    imdb_id = data.get("imdb_id")
+
+    global admin_movie_list
+    admin_movie_list = [m for m in admin_movie_list if m["imdb_id"] != imdb_id]
+
+    return {"message": "Removed", "movies": admin_movie_list}
 
 if __name__ == '__main__':
     with app.app_context():

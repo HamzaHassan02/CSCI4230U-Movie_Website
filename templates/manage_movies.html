@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% set show_navbar = true %}
+
+{% block content %}
+
+<h1 class="manage-movies__title">Manage Movies</h1>
+<p class="manage-movies__subtitle">Search, add, or remove movies.</p>
+
+<div class="manage-movies__container">
+
+    <!-- SEARCH BAR -->
+    <input type="text" id="movie-search" class="manage-search" placeholder="Search for movie...">
+
+    <!-- SEARCH RESULTS -->
+    <div id="search-results" class="search-results"></div> <!-- JS will dynamically fill this -->
+
+    <hr class="divider">
+
+    <h2 class="manage-listing">Current Movie Showing</h2>
+
+    <div id="admin-movie-list" class="movie-list-grid">
+        {% for m in movies %}
+        <div class="movie-item" data-id="{{ m.imdb_id }}">
+            <img src="{{ m.poster }}" class="movie-img">
+            <p>{{ m.title }} ({{ m.year }})</p>
+            <button class="remove-btn" onclick="removeMovie('{{ m.imdb_id }}')">Remove</button>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script>
+/* ------- Search ------- */
+document.getElementById("movie-search").addEventListener("input", async (e) => {
+    const query = e.target.value.trim();
+
+    const container = document.getElementById("search-results");
+
+    if (!query) {
+        container.innerHTML = "";
+        return;
+    }
+
+    const res = await fetch(`/admin/search-movies?q=${query}`);
+    const data = await res.json();
+
+    container.innerHTML = ""; // Clear old results
+
+    data.results.forEach(movie => {
+        container.innerHTML += `
+            <div class="search-result-item">
+
+                <img src="${movie.Poster}" class="search-result-poster">
+
+                <div class="search-result-info">
+                    <h3>${movie.Title} (${movie.Year})</h3>
+                    <button class="add-btn"
+                        onclick="addMovie('${movie.imdbID}', '${movie.Title}', '${movie.Year}', '${movie.Poster}')">
+                        Add
+                    </button>
+                </div>
+
+            </div>
+        `;
+    });
+});
+
+/* ------- Add Movie ------- */
+async function addMovie(id, title, year, poster) {
+    await fetch("/admin/add-movie", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imdb_id: id, title, year, poster })
+    });
+
+    location.reload(); // refresh and reload page
+}
+
+/* ------- Remove Movie ------- */
+async function removeMovie(id) {
+    await fetch("/admin/remove-movie", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imdb_id: id })
+    });
+
+    location.reload();
+}
+</script>
+
+{% endblock %}

@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from models import Booking, Movie, db
 from routes.auth_routes import auth_bp
 from routes.booking_routes import booking_bp
+from routes.user_routes import user_bp
+from models import User
 
 load_dotenv()
 
@@ -29,9 +31,28 @@ db.init_app(app)
 jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(booking_bp)
+app.register_blueprint(user_bp)
 
 with app.app_context():
     db.create_all()
+    # Seed admin user if missing to ensure admin access is available
+    pepper_value = os.getenv("PEPPER")
+    if pepper_value:
+        admin_username = os.getenv("ADMIN_USERNAME", "admin")
+        admin_password = os.getenv("ADMIN_PASSWORD", "Admin123!")
+        existing_admin = User.query.filter_by(username=admin_username).first()
+        if not existing_admin:
+            import bcrypt
+
+            def hash_password(password: str, pepper: bytes):
+                salt = bcrypt.gensalt()
+                hashed = bcrypt.hashpw(password.encode("utf-8") + pepper, salt)
+                return hashed, salt
+
+            password_hash, salt = hash_password(admin_password, pepper_value.encode("utf-8"))
+            admin_user = User(username=admin_username, password_hash=password_hash, salt=salt, role="admin")
+            db.session.add(admin_user)
+            db.session.commit()
 
 @app.context_processor
 def inject_user_context():

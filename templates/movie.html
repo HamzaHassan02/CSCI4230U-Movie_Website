@@ -6,7 +6,7 @@
 <div class="movie-details">
 
   <!-- Poster -->
-  <img class="movie-details__poster" src="{{ movie.poster_url }}">
+  <img class="movie-details__poster" src="{{ movie.poster }}">
 
   <!-- Info -->
   <div class="movie-details__info">
@@ -20,7 +20,7 @@
     <p><b>Actors:</b> {{ movie.actors }}</p>
     <p><b>Rating:</b> {{ movie.rating }}</p>
 
-    <a href="{{ url_for('booking', movie_id=movie.id) }}">
+    <a href="{{ url_for('booking', movie_id=movie.imdb_id) }}">
       <button class="movie-details__button">Book Now</button>
     </a>
 

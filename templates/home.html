@@ -6,10 +6,10 @@
 <h1 class="movie-list__title">Now Showing</h1>
 <div class="movie-list">
 {% for movie in movies %}
-<a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="movie-card">
-  <img class="movie-card__poster" src="{{ movie.poster_url }}">
-  <h3 class="movie-card__title">{{ movie.title }}</h3>
-</a>
+    <a href="{{ url_for('movie_detail', movie_id=movie.imdb_id) }}" class="movie-card">
+        <img class="movie-card__poster" src="{{ movie.poster }}">
+        <h3 class="movie-card__title">{{ movie.title }}</h3>
+    </a>
 {% endfor %}
 </div>
 {% endblock %}

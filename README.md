@@ -37,3 +37,7 @@ TICKET_PRICE_CENTS=1300
 ```
 python app.py
 ```
+## How to run tests
+```
+pytest -q
+```

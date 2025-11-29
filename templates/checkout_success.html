@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% set show_navbar = true %}
+{% block title %}Payment Success | MovieReservation{% endblock %}
+{% block content %}
+<section class="checkout-result" style="text-align: center; color: #fff;">
+  <h1>Payment Successful</h1>
+  {% if message %}
+    <p>{{ message }}</p>
+  {% else %}
+    <p>Your booking has been saved.</p>
+    {% if booking %}
+      <div class="booking-summary">
+        <p><strong>Movie:</strong> {{ booking.movie_title }}</p>
+        <p><strong>Date:</strong> {{ booking.show_date }}</p>
+        <p><strong>Showtime:</strong> {{ booking.showtime }}</p>
+        <p><strong>Seats:</strong> {{ booking.quantity }}</p>
+      </div>
+    {% endif %}
+    <a class="booking-form__button booking-form__button--confirm" href="{{ url_for('bookings') }}">Go to My Bookings</a>
+  {% endif %}
+</section>
+{% endblock %}

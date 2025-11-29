@@ -13,9 +13,10 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* ------------- */
-/* Navbar (BEM)  */
-/* ------------- */
+
+/* -------*/
+/* Navbar */
+/* ------ */
 .navbar {
   background-color: #222;
   padding: 15px 25px;
@@ -59,9 +60,10 @@ body {
 
 } 
 
-/* ---------------- */
-/* Login Page (BEM) */
-/* ---------------- */
+
+/* ---------- */
+/* Login Page */
+/* ---------- */
 /* Page wrapper – centers everything */
 .auth-wrapper {
     display: flex;
@@ -73,7 +75,7 @@ body {
 
 /* Logo above form */
 .auth-logo {
-    margin-bottom: 0px; /* reduce space between logo and form */
+    margin-bottom: 0px;
 }
 
 .auth-logo__img {
@@ -118,9 +120,10 @@ body {
   background: #3156c7;
 }
 
-/* ---------------- */
-/* Auth Card (BEM)  */
-/* ---------------- */
+
+/* --------- */
+/* Auth Card */
+/* --------- */
 .auth-card {
   max-width: 360px;
   margin: 80px auto;
@@ -179,9 +182,10 @@ body {
   margin-top: 15px;
 }
 
-/* ------------------- */
-/* Movie List (Home)   */
-/* ------------------- */
+
+/* ---------- */
+/* Movie List */
+/* ---------- */
 .movie-list__title {
   color: white;
   text-align: center;
@@ -196,7 +200,6 @@ body {
   justify-content: center;
 }
 
-/* Movie card is now an <a> */
 .movie-card {
   display: block;
   background: white;
@@ -224,9 +227,10 @@ body {
   margin-top: 10px;
 }
 
-/* ---------------------- */
-/* Movie Details (BEM)    */
-/* ---------------------- */
+
+/* ------------- */
+/* Movie Details */
+/* ------------- */
 .movie-details {
   display: flex;
   gap: 30px;
@@ -237,8 +241,11 @@ body {
 }
 
 .movie-details__poster {
-  width: 280px;
-  border-radius: 8px;
+    width: 500px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
 }
 
 .movie-details__info {
@@ -268,9 +275,9 @@ body {
 
 
 
-/* -------------------- */
-/* Booking Form (BEM)   */
-/* -------------------- */
+/* ------------ */
+/* Booking Form */
+/* ------------ */
 .booking__title {
   text-align: center;
   margin-top: 20px;
@@ -345,8 +352,11 @@ body {
 }
 
 .booking-details__poster {
-  width: 260px;
-  border-radius: 8px;
+    width: 320px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
 }
 
 .booking-details__form {
@@ -364,9 +374,14 @@ body {
   color: #444;
 }
 
-/* --------------------- */
-/* My Bookings (BEM)     */
-/* --------------------- */
+.selected-showtime {
+  background-color: #4CAF50 !important;
+  color: white !important;
+}
+
+/* ----------- */
+/* My Bookings */
+/* ----------- */
 .bookings__title {
   text-align: center;
   margin-top: 20px;
@@ -427,9 +442,9 @@ body {
   margin-top: 30px;
 }
 
-/* ---------------------- */
-/* Admin Dashboard (BEM)  */
-/* ---------------------- */
+/* --------------- */
+/* Admin Dashboard */
+/* --------------- */
 .admin__title {
   text-align: center;
   margin-top: 20px;
@@ -481,9 +496,9 @@ body {
   color: white;
 }
 
-/* ---------------------- */
-/* Manage Movies (BEM)  */
-/* ---------------------- */
+/* ------------- */
+/* Manage Movies */
+/* ------------- */
 .manage-movies__title {
     text-align: center;
     margin-bottom: 10px;
@@ -598,10 +613,4 @@ body {
 
 .remove-btn:hover {
     background: #c9302c;
-}
-
-
-.selected-showtime {
-  background-color: #4CAF50 !important;
-  color: white !important;
 }

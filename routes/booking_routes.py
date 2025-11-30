@@ -305,22 +305,15 @@ def stripe_webhook():
 
 @booking_bp.route("/api/bookings/<int:booking_id>", methods=["PUT", "PATCH"])
 def update_booking(booking_id):
-    # Update fields on a booking owned by the current user
-    username = session.get("username")
-    role = session.get("role")
-    if role == "admin":
-        is_admin = True
-    else:
-        is_admin = False
-
-    if not username:
-        return jsonify({"message": "Authentication required"}), 401
+    # Only admins can update bookings
+    if session.get("role") != "admin":
+        return jsonify({"message": "Admin access required"}), 403
 
     booking = Booking.query.get(booking_id)
     if not booking:
         return jsonify({"message": "Booking not found"}), 404
-    if not is_admin and booking.booked_by != username:
-        return jsonify({"message": "Not authorized to update this booking"}), 403
+
+    original_booked_by = booking.booked_by
 
     payload = request.get_json() or {}
     updates = {}
@@ -354,6 +347,9 @@ def update_booking(booking_id):
 
     for field, value in updates.items():
         setattr(booking, field, value)
+
+    # Never change who made the booking
+    booking.booked_by = original_booked_by
 
     try:
         db.session.commit()

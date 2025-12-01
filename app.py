@@ -134,11 +134,12 @@ def booking(movie_id):
 @login_required_view
 def edit_booking(booking_id):
     username = session.get("username")
+    is_admin = session.get("role") == "admin"
     if not username:
         return redirect(url_for("auth.login"))
 
     booking_record = Booking.query.get_or_404(booking_id)
-    if booking_record.booked_by != username:
+    if not is_admin and booking_record.booked_by != username:
         return redirect(url_for("bookings"))
 
     movie = Movie.query.filter_by(title=booking_record.movie_title).first()
@@ -159,7 +160,12 @@ def edit_booking(booking_id):
         "quantity": booking_record.quantity,
     }
 
-    return render_template("booking.html", movie=movie, showtimes=dummy_showtimes, existing_booking=existing_booking)
+    return render_template(
+        "booking.html",
+        movie=movie,
+        showtimes=dummy_showtimes,
+        existing_booking=existing_booking,
+    )
 
 @app.route("/my-bookings")
 @login_required_view

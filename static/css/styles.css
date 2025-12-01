@@ -431,6 +431,10 @@ body {
   margin-top: 10px;
 }
 
+.booking-card__actions--admin {
+  justify-content: flex-end;
+}
+
 .booking-card__info--user {
   font-style: italic;
   color: #555;
@@ -452,8 +456,8 @@ body {
 }
 
 .admin {
-  width: 90%;
-  max-width: 700px;
+  width: 95%;
+  max-width: 1100px;
   margin: 20px auto;
 }
 
@@ -477,11 +481,106 @@ body {
     background: #005fcc;
 }
 
+.admin-panels {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.admin-panel {
+  background: rgba(255, 255, 255, 0.96);
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+}
+
+.admin-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-panel__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.admin-panel__count {
+  background: #0f5bc4;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: bold;
+  min-width: 36px;
+  text-align: center;
+}
+
+.admin-panel__hint {
+  margin: 6px 0 12px;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-list--bookings .booking-card {
+  margin: 0;
+}
+
+.admin-list__empty {
+  margin: 0;
+  color: #666;
+  font-style: italic;
+}
+
+.admin__message {
+  margin-top: 14px;
+  color: #ff6b6b;
+  text-align: center;
+  min-height: 18px;
+}
+
 .admin-user {
-  background: white;
+  background: #f7f8fb;
   padding: 15px;
   border-radius: 8px;
-  margin-bottom: 15px;
+  border: 1px solid #e5e9f2;
+}
+
+.admin-user__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-user__name {
+  margin: 0;
+}
+
+.admin-user__role {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e2ecff;
+  color: #0f5bc4;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.admin-user__meta {
+  margin: 8px 0 0;
+  color: #555;
+}
+
+.admin-user__actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .admin-user__button {
@@ -491,9 +590,26 @@ body {
   border: none;
 }
 
+.admin-user__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .admin-user__button--danger {
   background: #ff6b6b;
   color: white;
+}
+
+.booking-card--compact {
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: none;
+  border: 1px solid #e5e9f2;
+}
+
+.booking-card__info--meta {
+  color: #666;
+  font-size: 0.95rem;
 }
 
 /* ------------- */

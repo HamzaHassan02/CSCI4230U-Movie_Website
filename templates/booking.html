@@ -18,7 +18,7 @@
         <label class="booking-form__label" style="margin-top: 20px;">Showtime:</label>
         <div class="booking-form__showtimes">
             {% for show in showtimes %}
-            <button class="booking-form__showtime" data-time="{{ show.time }}" data-available="{{ show.available }}">{{ show.time }} ({{ show.available }} seats)</button>
+            <button class="booking-form__showtime" data-time="{{ show.time }}" data-available="{{ show.available }}">{{ show.time }}</button>
             {% endfor %}
         </div>
 

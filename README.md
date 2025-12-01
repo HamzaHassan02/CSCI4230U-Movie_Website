@@ -37,6 +37,19 @@ TICKET_PRICE_CENTS=1300
 ```
 python app.py
 ```
+
+or 
+
+Start with Docker: 
+```
+docker build -t movie-website .
+```
+
+then run: 
+
+```
+docker run --env-file .env -p 5000:5000 -v "$(pwd)/instance:/app/instance" movie-website
+```
 ## How to run tests
 ```
 pytest -q

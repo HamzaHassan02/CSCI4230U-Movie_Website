@@ -425,7 +425,7 @@ const initBookingForm = () => {
 
     const isCreateMode = !isEditMode;
     const url = isCreateMode ? '/api/bookings/checkout' : `/api/bookings/${existingBooking.id}`;
-    const method = isCreateMode ? 'POST' : 'PATCH';
+    const method = isCreateMode ? 'POST' : 'PUT';
 
     if (isCreateMode) {
       payload.movie_title = movieTitle;

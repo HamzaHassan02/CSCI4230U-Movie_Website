@@ -303,7 +303,7 @@ def stripe_webhook():
     return "", 200
 
 
-@booking_bp.route("/api/bookings/<int:booking_id>", methods=["PUT", "PATCH"])
+@booking_bp.route("/api/bookings/<int:booking_id>", methods=["PUT"])
 def update_booking(booking_id):
     # Only admins can update bookings
     if session.get("role") != "admin":

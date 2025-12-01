@@ -1,8 +1,9 @@
 import os
 import requests
+import bcrypt
 from app import app, db
 from models import User, Movie
-import bcrypt
+from datetime import date, timedelta
 
 OMDB_API_KEY = "225f5d3d"
 
@@ -13,6 +14,8 @@ seed_titles = [
     "Zootopia 2",
     "Predator: Badlands"
 ]
+
+expiration = date.today() + timedelta(days=90)   # 3 months in theaters
 
 def fetch_movie(title):
     url = f"http://www.omdbapi.com/?apikey={OMDB_API_KEY}&s={title}&type=movie"
@@ -79,7 +82,8 @@ with app.app_context():
             imdb_id=imdb_id,
             title=data.get("Title"),
             year=data.get("Year"),
-            poster=data.get("Poster")
+            poster=data.get("Poster"),
+            expiration=expiration
         )
         db.session.add(movie)
         print(f"Added movie: {title}")

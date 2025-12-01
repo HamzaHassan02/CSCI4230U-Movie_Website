@@ -4,6 +4,7 @@ from functools import wraps
 from flask import Flask, redirect, render_template, session, url_for, request
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from dotenv import load_dotenv
+from datetime import date, datetime, timedelta
 
 from models import Booking, Movie, db
 from routes.auth_routes import auth_bp
@@ -109,7 +110,12 @@ def movie_detail(movie_id):
 @login_required_view
 def booking(movie_id):
     movie = Movie.query.filter_by(imdb_id=movie_id).first()
-    return render_template("booking.html", movie=movie, showtimes=dummy_showtimes, existing_booking=None)
+    return render_template(
+        "booking.html", movie=movie, 
+        showtimes=dummy_showtimes, 
+        existing_booking=None, 
+        today=date.today().isoformat()        
+    )
 
 
 @app.route("/booking/edit/<int:booking_id>")
@@ -147,6 +153,7 @@ def edit_booking(booking_id):
         movie=movie,
         showtimes=dummy_showtimes,
         existing_booking=existing_booking,
+        today=date.today().isoformat()
     )
 
 @app.route("/my-bookings")
@@ -199,7 +206,8 @@ def manage_movies():
         return redirect(url_for("home"))
 
     movies = Movie.query.all()
-    return render_template("manage_movies.html", movies=movies)
+    week = (date.today() + timedelta(days=7)).isoformat()
+    return render_template("manage_movies.html", movies=movies, week=week)
 
 @app.route("/admin/search-movies", methods=["GET"])
 @login_required_view
@@ -230,6 +238,11 @@ def add_movie():
     title = data.get("title")
     year = data.get("year")
     poster = data.get("poster")
+    expiration_str = data.get("expiration")
+    
+    expiration = None
+    if expiration_str:
+        expiration = datetime.strptime(expiration_str, "%Y-%m-%d").date()
 
     # Check DB duplicate
     existing_movie = Movie.query.filter_by(imdb_id=imdb_id).first()
@@ -241,7 +254,8 @@ def add_movie():
         imdb_id=imdb_id,
         title=title,
         year=year,
-        poster=poster
+        poster=poster,
+        expiration=expiration
     )
     db.session.add(new_movie)
     db.session.commit()

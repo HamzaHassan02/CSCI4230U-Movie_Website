@@ -35,7 +35,7 @@ def client(tmp_path):
 def test_home_page_renders_index(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Welcome to MovieReservation" in response.data
+    assert b'login__title">Welcome' in response.data
 
 # valid registration test
 def test_register_creates_valid_user(client):
@@ -62,6 +62,7 @@ def test_register_invalid_username_valid_password(client):
     username_errors = [error["msg"] for error in body["errors"] if error["field"] == "username"]
     assert "Username may only contain letters, numbers, and underscores" in username_errors
 
+#test entering in a short username
 def test_register_short_username(client):
     payload = {"username": "abc", "password": "Valid123!"}
     response = client.post("/register", data=json.dumps(payload), content_type="application/json")
@@ -83,6 +84,7 @@ def test_register_validation_errors(client):
     assert "Username must have at least 4 characters" in username_errors
     assert "Password must be at least 8 characters" in password_errors
 
+#test that you enter in a password with no number
 def test_register_no_number_in_password(client):
     payload = {"username": "validuser", "password": "NoNumber!"}
     response = client.post("/register", data=json.dumps(payload), content_type="application/json")
@@ -92,6 +94,7 @@ def test_register_no_number_in_password(client):
     password_errors = [error["msg"] for error in body["errors"] if error["field"] == "password"]
     assert "Password must have a number" in password_errors
 
+#Test entering in a valid username and invalid password(missing special character)
 def test_register_valid_username_no_special_character_in_password(client):
     payload = {"username": "validuser", "password": "shorttt1"}
     response = client.post("/register", data=json.dumps(payload), content_type="application/json")
@@ -204,9 +207,8 @@ def test_post_booking_missing_user(client):
     assert response.status_code == 400
     assert "user is required." in response.get_json()["errors"]
 
-
-# test a successful booking update
-def test_update_booking_success(client):
+#test admin updating booking for user
+def test_update_booking_success_admin_only(client):
     with app.app_context():
         booking = Booking(
             movie_title="Interstellar",
@@ -221,10 +223,11 @@ def test_update_booking_success(client):
         booking_id = booking.id
 
     with client.session_transaction() as sess:
-        sess["username"] = "booker"
+        sess["username"] = "admin"
+        sess["role"] = "admin"
 
     payload = {"date": "2025-02-02", "showtime": {"time": "9:00 PM", "available": 8}, "quantity": 3}
-    response = client.patch(
+    response = client.put(
         f"/api/bookings/{booking_id}",
         data=json.dumps(payload),
         content_type="application/json",
@@ -235,12 +238,14 @@ def test_update_booking_success(client):
     assert body["booking"]["date"] == "2025-02-02"
     assert body["booking"]["showtime"]["time"] == "9:00 PM"
     assert body["booking"]["quantity"] == 3
+    assert body["booking"]["user"] == "booker"
     with app.app_context():
         updated = Booking.query.get(booking_id)
         assert updated.show_date == "2025-02-02"
         assert updated.showtime == "9:00 PM"
         assert updated.quantity == 3
         assert updated.showtime_available == 8
+        assert updated.booked_by == "booker"
 
 
 # test a successful booking deletion
@@ -268,4 +273,99 @@ def test_delete_booking_success(client):
     assert body["message"] == "Booking cancelled successfully"
     assert body["booking_id"] == booking_id
     with app.app_context():
+        assert Booking.query.get(booking_id) is None
+
+#test admin deleting user booking
+def test_admin_can_delete_user_booking(client):
+    with app.app_context():
+        booking = Booking(
+            movie_title="Blade Runner",
+            show_date="2025-04-01",
+            showtime="9:00 PM",
+            showtime_available=5,
+            quantity=1,
+            booked_by="user_to_delete",
+        )
+        db.session.add(booking)
+        db.session.commit()
+        booking_id = booking.id
+
+    with client.session_transaction() as sess:
+        sess["username"] = "admin"
+        sess["role"] = "admin"
+
+    response = client.delete(f"/api/bookings/{booking_id}")
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["message"] == "Booking cancelled successfully"
+    assert body["booking_id"] == booking_id
+    with app.app_context():
+        assert Booking.query.get(booking_id) is None
+
+#test admin editing a user booking
+def test_admin_edit_user_booking(client):
+    with app.app_context():
+        booking = Booking(
+            movie_title="Arrival",
+            show_date="2025-05-01",
+            showtime="6:00 PM",
+            showtime_available=20,
+            quantity=2,
+            booked_by="regular_user",
+        )
+        db.session.add(booking)
+        db.session.commit()
+        booking_id = booking.id
+
+    with client.session_transaction() as sess:
+        sess["username"] = "admin"
+        sess["role"] = "admin"
+
+    payload = {"date": "2025-05-02", "showtime": {"time": "8:00 PM", "available": 15}, "quantity": 4}
+    response = client.put(
+        f"/api/bookings/{booking_id}",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["booking"]["user"] == "regular_user"
+    assert body["booking"]["quantity"] == 4
+    assert body["booking"]["showtime"]["time"] == "8:00 PM"
+    with app.app_context():
+        updated = Booking.query.get(booking_id)
+        assert updated.booked_by == "regular_user"
+        assert updated.quantity == 4
+        assert updated.show_date == "2025-05-02"
+        assert updated.showtime == "8:00 PM"
+
+#test admin deleting a user and thus deleting their booking automatically
+def test_admin_delete_user_and_bookings(client):
+    with app.app_context():
+        user = User(username="victim", password_hash=b"hash", salt=b"salt", role="user")
+        booking = Booking(
+            movie_title="Tenet",
+            show_date="2025-06-01",
+            showtime="7:00 PM",
+            showtime_available=10,
+            quantity=1,
+            booked_by="victim",
+        )
+        db.session.add(user)
+        db.session.add(booking)
+        db.session.commit()
+        user_id = user.id
+        booking_id = booking.id
+
+    with client.session_transaction() as sess:
+        sess["username"] = "admin"
+        sess["role"] = "admin"
+
+    response = client.delete(f"/api/users/{user_id}")
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["user_id"] == user_id
+    assert body.get("deleted_bookings") == 1
+    with app.app_context():
+        assert User.query.get(user_id) is None
         assert Booking.query.get(booking_id) is None

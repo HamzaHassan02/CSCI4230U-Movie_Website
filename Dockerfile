@@ -1,32 +1,19 @@
 FROM python:3.11-slim
 
-# Prevent Python from writing pyc files and enable unbuffered output
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
+# Set work directory
 WORKDIR /app
 
-# Install build dependencies (for bcrypt and similar packages)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
-    libssl-dev \
-    libffi-dev \
- && rm -rf /var/lib/apt/lists/*
+# Copy requirements (we’ll make one)
+COPY requirements.txt .
 
-# Install Python dependencies first to leverage Docker layer caching
-COPY requirements.txt ./
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy the rest of the app
 COPY . .
 
-# Default Flask/Gunicorn configuration
-ENV FLASK_APP=app.py \
-    FLASK_RUN_HOST=0.0.0.0 \
-    FLASK_RUN_PORT=5000
-
+# Expose the port Flask runs on
 EXPOSE 5000
 
-# Use gunicorn in production-style execution
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+# Run the app
+CMD ["python", "app.py"]

@@ -2,8 +2,8 @@ import os
 
 import stripe
 from flask import Blueprint, jsonify, render_template, request, session, url_for
-
-from models import Booking, db
+from datetime import datetime, date
+from models import Booking, Movie, db
 
 booking_bp = Blueprint("booking_api", __name__)
 
@@ -53,6 +53,19 @@ def post_booking():
 
     if errors:
         return jsonify({"message": "Invalid booking payload", "errors": errors}), 400
+    
+    movie = Movie.query.filter_by(title=movie_title).first()
+    if movie and movie.expiration:
+        today = date.today()
+        booking_date_obj = datetime.strptime(show_date, "%Y-%m-%d").date()
+        # Cannot book before today
+        if booking_date_obj < today:
+            return jsonify({"message": "You cannot book a date in the past."}), 400
+        # Cannot book after expiration
+        if booking_date_obj > movie.expiration:
+            return jsonify({
+                "message": f"This movie is no longer in theaters after {movie.expiration}."
+            }), 400
 
     booking = Booking(
         movie_title=movie_title,

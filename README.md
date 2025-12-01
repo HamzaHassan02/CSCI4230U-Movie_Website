@@ -32,8 +32,11 @@ DATABASE_URL=sqlite:///database.db
 STRIPE_SECRET_KEY= 
 TICKET_PRICE_CENTS=1300
 ```
-
-4. Start app
+4. Seed admin & movies
+```
+python seed.py
+```
+5. Start app
 ```
 python app.py
 ```

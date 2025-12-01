@@ -30,3 +30,4 @@ class Movie(db.Model):
     title = db.Column(db.String(200), nullable=False)
     year = db.Column(db.String(10), nullable=False)
     poster = db.Column(db.String(300), nullable=False)
+    expiration = db.Column(db.Date, nullable=True)

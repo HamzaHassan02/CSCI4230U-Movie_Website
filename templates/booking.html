@@ -13,7 +13,7 @@
     <!-- Booking Form -->
     <div class="booking-details__form">
         <label class="booking-form__label">Date:</label>
-        <input id="dateInput" type="date" class="booking-form__input">
+        <input id="dateInput" type="date" class="booking-form__input" min="{{ today }}" max="{{ movie.expiration }}">
 
         <label class="booking-form__label" style="margin-top: 20px;">Showtime:</label>
         <div class="booking-form__showtimes">

@@ -55,6 +55,8 @@ document.getElementById("movie-search").addEventListener("input", async (e) => {
 
                 <div class="search-result-info">
                     <h3>${movie.Title} (${movie.Year})</h3>
+                    <label style="color:white;font-size:0.9rem;">In theaters until:</label>
+                    <input type="date" id="exp-${movie.imdbID}" class="exp-input" min="{{ week }}">
                     <button class="add-btn"
                         onclick="addMovie('${movie.imdbID}', '${movie.Title}', '${movie.Year}', '${movie.Poster}')">
                         Add
@@ -68,10 +70,12 @@ document.getElementById("movie-search").addEventListener("input", async (e) => {
 
 /* ------- Add Movie ------- */
 async function addMovie(id, title, year, poster) {
+    const expDate = document.getElementById(`exp-${id}`).value;
+    
     await fetch("/admin/add-movie", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imdb_id: id, title, year, poster })
+        body: JSON.stringify({ imdb_id: id, title, year, poster, expiration: expDate })
     });
 
     location.reload(); // refresh and reload page

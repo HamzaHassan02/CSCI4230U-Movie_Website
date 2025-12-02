@@ -14,6 +14,10 @@ jobs:
 
     env:
       E2E_BASE_URL: http://localhost:5000
+      SECRET_KEY: test
+      JWT_SECRET_KEY: test-jwt
+      PEPPER: test-pepper
+      DATABASE_URL: sqlite:///database.db
 
     steps:
       - name: Checkout repository

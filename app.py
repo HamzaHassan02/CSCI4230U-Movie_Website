@@ -66,17 +66,34 @@ def login_required_view(fn):
 
 # Chatbot functions 
 def build_movie_knowledge():
-    """Return a text summary of movies currently in the DB."""
+    """Return detailed movie summaries using both DB and OMDB."""
     movies = Movie.query.all()
     if not movies:
-        return "There are currently no movies playing."
+        return "No movies available."
 
-    lines = []
+    details = []
     for m in movies:
-        exp = m.expiration_date.isoformat() if getattr(m, "expiration_date", None) else "no expiration set"
-        year = m.year or "unknown year"
-        lines.append(f"- {m.title} ({year}), stops playing on {exp}.")
-    return "\n".join(lines)
+        try:
+            omdb_data = requests.get(
+                f"http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={m.imdb_id}&plot=short"
+            ).json()
+
+            actors = omdb_data.get("Actors", "Unknown actors")
+            genre = omdb_data.get("Genre", "Unknown genre")
+            plot = omdb_data.get("Plot", "No plot available")
+            rating = omdb_data.get("imdbRating", "N/A")
+
+            details.append(
+                f"Title: {m.title}. Genre: {genre}. Actors: {actors}. "
+                f"Rating: {rating}. Plot: {plot}"
+            )
+
+        except Exception as e:
+            print("Error occured:", e)
+            details.append(f"Title: {m.title}. Limited info available.")
+
+    return "\n".join(details)
+
 
 
 def ask_movie_bot(user_message: str) -> str:
@@ -84,17 +101,20 @@ def ask_movie_bot(user_message: str) -> str:
     context = build_movie_knowledge()
 
     prompt = f"""
-                You are FlickBook, a helpful movie assistant for a small theater.
-                Answer only using the movie list below. If the user asks about a movie
-                that isn't listed, tell them it's not currently playing.
+                You are FlickBook's concise movie assistant.
 
-                Movies currently playing:
+                Use ONLY the movie data provided below. 
+                If the user asks about movies, an actor, genre, rating, or plot, check the provided movie list.
+
+                Keep answers SHORT:
+                - 1 to 2 sentences
+                - Directly answer the question
+                - Do NOT include long lists or summaries unless asked
+
+                Movie Data:
                 {context}
 
-                User question: {user_message}
-
-                When recommending, suggest 1–3 specific titles from the list and explain briefly why.
-                Reply in at most 4 short sentences.
+                User: {user_message}
             """.strip()
 
     try:

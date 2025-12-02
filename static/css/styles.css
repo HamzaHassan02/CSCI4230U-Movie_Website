@@ -261,8 +261,8 @@ body {
   overflow: hidden;
 }
 
-.movie-chatbot--hidden {
-  display: none;
+#movie-chatbot-window.movie-chatbot--hidden {
+    display: none;
 }
 
 .movie-chatbot__header {

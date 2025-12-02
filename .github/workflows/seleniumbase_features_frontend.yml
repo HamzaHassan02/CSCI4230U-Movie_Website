@@ -3,7 +3,7 @@ name: SeleniumBase E2E (features/frontend)
 on:
   push:
     branches:
-      - features/frontend
+      - feature/frontend
   workflow_dispatch:
 
 jobs:

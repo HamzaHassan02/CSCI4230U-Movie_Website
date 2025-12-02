@@ -2,9 +2,12 @@ name: CodeQL
 
 on:
     push:
-        branches: [ "**" ]
+        branches: [ main ]
     pull_request:
-        branches: [ "**" ]
+        branches: [ main ]
+
+permissions: 
+    security-events: write
 
 jobs:
     analyze:

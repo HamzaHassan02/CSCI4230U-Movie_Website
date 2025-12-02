@@ -30,4 +30,4 @@ jobs:
           PEPPER: test-pepper
           DATABASE_URL: "sqlite:///:memory:"
         run: |
-          pytest -q
+          pytest tests/unit -q

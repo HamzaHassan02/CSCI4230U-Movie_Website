@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies first to leverage Docker layer caching
+# Install Python dependencies first
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -28,5 +28,5 @@ ENV FLASK_APP=app.py \
 
 EXPOSE 5000
 
-# Use gunicorn in production-style execution
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+# Run the seed script before launching gunicorn
+CMD ["sh", "-c", "python seed.py && gunicorn -b 0.0.0.0:5000 app:app"]

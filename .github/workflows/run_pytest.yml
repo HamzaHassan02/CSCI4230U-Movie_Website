@@ -28,6 +28,6 @@ jobs:
           SECRET_KEY: test
           JWT_SECRET_KEY: test-jwt
           PEPPER: test-pepper
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: "sqlite:///:memory:"
         run: |
           pytest -q

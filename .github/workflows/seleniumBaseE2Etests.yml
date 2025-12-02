@@ -49,8 +49,16 @@ jobs:
 
       - name: Start backend server
         run: |
-          nohup python app.py &
-          sleep 5
+          python app.py > server.log 2>&1 &
+          for i in {1..40}; do
+            if curl -sSf http://localhost:5000/ > /dev/null; then
+              echo "Server is up"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Server failed to start" && cat server.log
+          exit 1
         shell: bash
 
       - name: Run E2E SeleniumBase tests (headless)

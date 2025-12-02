@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature/frontend
+      - feature/backend
+      - dev 
+      - main
   workflow_dispatch:
 
 jobs:

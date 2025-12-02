@@ -17,6 +17,15 @@ load_dotenv()
 OMDB_API_KEY = "225f5d3d"
 OMDB_URL = "http://www.omdbapi.com/"
 
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
+
+set_showtimes = [
+    {"time": "2:00 PM", "available": 15},
+    {"time": "5:30 PM", "available": 9},
+    {"time": "8:00 PM", "available": 20},
+]
+
 app = Flask(__name__)
 # Configure SQLite Database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
@@ -44,16 +53,6 @@ def inject_user_context():
         "current_username": session.get("username"),
     }
 
-
-# -----------------------
-# Dummy Data (Temporary)
-# -----------------------
-dummy_showtimes = [
-    {"time": "2:00 PM", "available": 15},
-    {"time": "5:30 PM", "available": 9},
-    {"time": "8:00 PM", "available": 20},
-]
-
 def login_required_view(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -65,7 +64,61 @@ def login_required_view(fn):
 
     return wrapper
 
+# Chatbot functions 
+def build_movie_knowledge():
+    """Return a text summary of movies currently in the DB."""
+    movies = Movie.query.all()
+    if not movies:
+        return "There are currently no movies playing."
 
+    lines = []
+    for m in movies:
+        exp = m.expiration_date.isoformat() if getattr(m, "expiration_date", None) else "no expiration set"
+        year = m.year or "unknown year"
+        lines.append(f"- {m.title} ({year}), stops playing on {exp}.")
+    return "\n".join(lines)
+
+
+def ask_movie_bot(user_message: str) -> str:
+    """Send a prompt to Ollama using the movies in the DB as context."""
+    context = build_movie_knowledge()
+
+    prompt = f"""
+                You are FlickBook, a helpful movie assistant for a small theater.
+                Answer only using the movie list below. If the user asks about a movie
+                that isn't listed, tell them it's not currently playing.
+
+                Movies currently playing:
+                {context}
+
+                User question: {user_message}
+
+                When recommending, suggest 1–3 specific titles from the list and explain briefly why.
+                Reply in at most 4 short sentences.
+            """.strip()
+
+    try:
+        res = requests.post(
+            f"{OLLAMA_URL}/api/generate",
+            json={
+                "model": OLLAMA_MODEL,
+                "prompt": prompt,
+                "stream": False,
+            },
+            timeout=60,
+        )
+        res.raise_for_status()
+        data = res.json()
+        reply = data.get("response") or "Sorry, I couldn't generate a response."
+        return reply.strip()
+    except Exception as e:
+        print("Ollama error:", e)
+        return "LLM Error."
+
+
+# -----------------------
+# Routes
+# -----------------------
 @app.route("/")
 def home_page():
     return render_template("index.html") # route to login page
@@ -75,6 +128,19 @@ def home_page():
 def home():
     movies = Movie.query.all()
     return render_template("home.html", movies=movies)
+
+@app.route("/api/chat", methods=["POST"])
+@login_required_view
+def movie_chat():
+    if not request.is_json:
+        return {"error": "JSON body required"}, 400
+
+    message = (request.json.get("message") or "").strip()
+    if not message:
+        return {"error": "Empty message"}, 400
+
+    answer = ask_movie_bot(message)
+    return {"reply": answer}
 
 @app.route("/movie/<movie_id>")
 @login_required_view
@@ -112,7 +178,7 @@ def booking(movie_id):
     movie = Movie.query.filter_by(imdb_id=movie_id).first()
     return render_template(
         "booking.html", movie=movie, 
-        showtimes=dummy_showtimes, 
+        showtimes=set_showtimes, 
         existing_booking=None, 
         today=date.today().isoformat()        
     )
@@ -151,7 +217,7 @@ def edit_booking(booking_id):
     return render_template(
         "booking.html",
         movie=movie,
-        showtimes=dummy_showtimes,
+        showtimes=set_showtimes,
         existing_booking=existing_booking,
         today=date.today().isoformat()
     )
@@ -277,6 +343,7 @@ def remove_movie():
         db.session.commit()
 
     return {"message": "Movie removed"}
+
 
 if __name__ == '__main__':
     with app.app_context():

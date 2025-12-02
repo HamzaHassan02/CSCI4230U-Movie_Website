@@ -1,9 +1,12 @@
 <!-- home.html (Movie listings) -->
 {% extends 'base.html' %}
 {% set show_navbar = true %}
-{% block title %}Home | MovieReservation{% endblock %}
+
+{% block title %}Home | Now Showing{% endblock %}
+
 {% block content %}
 <h1 class="movie-list__title">Now Showing</h1>
+
 <div class="movie-list">
 {% for movie in movies %}
     <a href="{{ url_for('movie_detail', movie_id=movie.imdb_id) }}" class="movie-card">
@@ -12,10 +15,38 @@
     </a>
 {% endfor %}
 </div>
+<!-- Movie Chatbot -->
+<div id="movie-chatbot">
+    <button id="movie-chatbot-toggle" class="movie-chatbot__button">
+        💬 Ask about movies
+    </button>
+
+    <div id="movie-chatbot-window" class="movie-chatbot--hidden">
+        <div class="movie-chatbot__header">
+            <span>Movie Assistant</span>
+            <button id="movie-chatbot-close" type="button">&times;</button>
+        </div>
+
+        <div id="movie-chatbot-messages" class="movie-chatbot__messages">
+            <div class="movie-chatbot__message movie-chatbot__message--bot">
+                Hi! Ask me about movies that are currently playing.
+            </div>
+        </div>
+
+        <form id="movie-chatbot-form" class="movie-chatbot__form">
+            <input id="movie-chatbot-input" type="text" placeholder="E.g. Any good action movies?" autocomplete="off">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
+{% block scripts %}
 <script>
-    // Get token from browser storage
+    // Inject Flask URL into JS
+    window.CHAT_URL = "{{ url_for('movie_chat') }}";
+
+    // Get token from browser storage (optional)
     const token = localStorage.getItem("jwt");
 
     if (!token) {
@@ -25,3 +56,4 @@
 
     console.log("Token loaded:", token);
 </script>
+{% endblock %}

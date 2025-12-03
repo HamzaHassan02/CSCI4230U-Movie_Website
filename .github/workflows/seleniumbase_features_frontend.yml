@@ -48,6 +48,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install seleniumbase
           pip install -r requirements.txt
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+      - name: Seed database (admin + movies)
+        env:
+          SECRET_KEY: test
+          JWT_SECRET_KEY: test-jwt
+          PEPPER: test-pepper
+          DATABASE_URL: sqlite:///database.db
+          ADMIN_USERNAME: admin
+          ADMIN_PASSWORD: Admin123!
+        run: |
+          python seed.py
 
       - name: Start backend server
         run: |

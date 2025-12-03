@@ -340,6 +340,7 @@ const initBookingForm = () => {
   const bookingDataEl = document.getElementById('bookingData');
   if (!confirmBtn || !bookingDataEl) return;
 
+  const cancelBtn = document.querySelector('.booking-form__button--cancel');
   const dateInput = document.getElementById('dateInput');
   const quantityInput = document.getElementById('quantityInput');
   const messageEl = document.getElementById('bookingMessage');
@@ -389,6 +390,19 @@ const initBookingForm = () => {
         };
       }
     }
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      const params = new URLSearchParams(window.location.search);
+      const returnToAdmin = params.get('from') === 'admin';
+      if (isEditMode) {
+        window.location.href = returnToAdmin ? '/admin' : '/my-bookings';
+      } else {
+        window.location.href = '/home';
+      }
+    });
   }
 
   confirmBtn.addEventListener('click', async () => {

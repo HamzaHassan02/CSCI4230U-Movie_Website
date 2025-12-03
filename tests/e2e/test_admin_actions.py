@@ -16,8 +16,9 @@ class AdminActionsTests(BaseCase):
     booking_movie_title = f"Booking_{uuid.uuid4().hex[:5]}"
     booking_id = None
 
-    #helper function to register a user
     def _register_user(self, username: str, password: str, role: str = "user"):
+        if username == self.admin_username:
+            return 
         resp = requests.post(
             f"{self.base_url}/register",
             json={"username": username, "password": password, "role": role},

@@ -13,9 +13,10 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* ------------- */
-/* Navbar (BEM)  */
-/* ------------- */
+
+/* -------*/
+/* Navbar */
+/* ------ */
 .navbar {
   background-color: #222;
   padding: 15px 25px;
@@ -59,9 +60,10 @@ body {
 
 } 
 
-/* ---------------- */
-/* Login Page (BEM) */
-/* ---------------- */
+
+/* ---------- */
+/* Login Page */
+/* ---------- */
 /* Page wrapper – centers everything */
 .auth-wrapper {
     display: flex;
@@ -73,7 +75,7 @@ body {
 
 /* Logo above form */
 .auth-logo {
-    margin-bottom: 0px; /* reduce space between logo and form */
+    margin-bottom: 0px;
 }
 
 .auth-logo__img {
@@ -118,9 +120,10 @@ body {
   background: #3156c7;
 }
 
-/* ---------------- */
-/* Auth Card (BEM)  */
-/* ---------------- */
+
+/* --------- */
+/* Auth Card */
+/* --------- */
 .auth-card {
   max-width: 360px;
   margin: 80px auto;
@@ -179,9 +182,10 @@ body {
   margin-top: 15px;
 }
 
-/* ------------------- */
-/* Movie List (Home)   */
-/* ------------------- */
+
+/* ---------- */
+/* Homepage Movie List */
+/* ---------- */
 .movie-list__title {
   color: white;
   text-align: center;
@@ -196,7 +200,6 @@ body {
   justify-content: center;
 }
 
-/* Movie card is now an <a> */
 .movie-card {
   display: block;
   background: white;
@@ -224,9 +227,118 @@ body {
   margin-top: 10px;
 }
 
-/* ---------------------- */
-/* Movie Details (BEM)    */
-/* ---------------------- */
+/* Chatbot widget */
+#movie-chatbot {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  font-family: inherit;
+}
+
+#movie-chatbot-toggle {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  background-color: #ff4b4b;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+#movie-chatbot-window {
+  position: absolute;
+  bottom: 54px;
+  right: 0;
+  width: 320px;
+  max-height: 420px;
+  background: #111a3a;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#movie-chatbot-window.movie-chatbot--hidden {
+    display: none;
+}
+
+.movie-chatbot__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #1d2c5b;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.movie-chatbot__header button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.movie-chatbot__messages {
+  flex: 1;
+  padding: 10px;
+  background: #0b1530;
+  overflow-y: auto;
+  font-size: 0.9rem;
+}
+
+.movie-chatbot__message {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  line-height: 1.3;
+  max-width: 90%;
+}
+
+.movie-chatbot__message--user {
+  background: #2b4bff;
+  color: #ffffff;
+  margin-left: auto;
+}
+
+.movie-chatbot__message--bot {
+  background: #1b274f;
+  color: #ffffff;
+  margin-right: auto;
+}
+
+.movie-chatbot__form {
+  display: flex;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: #101a38;
+}
+
+.movie-chatbot__form input {
+  flex: 1;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  outline: none;
+}
+
+.movie-chatbot__form button {
+  border: none;
+  padding: 8px 12px;
+  background: #ff4b4b;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* ------------- */
+/* Movie Details */
+/* ------------- */
 .movie-details {
   display: flex;
   gap: 30px;
@@ -237,8 +349,11 @@ body {
 }
 
 .movie-details__poster {
-  width: 280px;
-  border-radius: 8px;
+    width: 500px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
 }
 
 .movie-details__info {
@@ -268,9 +383,9 @@ body {
 
 
 
-/* -------------------- */
-/* Booking Form (BEM)   */
-/* -------------------- */
+/* ------------ */
+/* Booking Form */
+/* ------------ */
 .booking__title {
   text-align: center;
   margin-top: 20px;
@@ -345,8 +460,11 @@ body {
 }
 
 .booking-details__poster {
-  width: 260px;
-  border-radius: 8px;
+    width: 320px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
 }
 
 .booking-details__form {
@@ -364,9 +482,14 @@ body {
   color: #444;
 }
 
-/* --------------------- */
-/* My Bookings (BEM)     */
-/* --------------------- */
+.selected-showtime {
+  background-color: #4CAF50 !important;
+  color: white !important;
+}
+
+/* ----------- */
+/* My Bookings */
+/* ----------- */
 .bookings__title {
   text-align: center;
   margin-top: 20px;
@@ -416,6 +539,10 @@ body {
   margin-top: 10px;
 }
 
+.booking-card__actions--admin {
+  justify-content: flex-end;
+}
+
 .booking-card__info--user {
   font-style: italic;
   color: #555;
@@ -427,25 +554,141 @@ body {
   margin-top: 30px;
 }
 
-/* ---------------------- */
-/* Admin Dashboard (BEM)  */
-/* ---------------------- */
+/* --------------- */
+/* Admin Dashboard */
+/* --------------- */
 .admin__title {
   text-align: center;
   margin-top: 20px;
+  color: white;
 }
 
 .admin {
-  width: 90%;
-  max-width: 700px;
+  width: 95%;
+  max-width: 1100px;
   margin: 20px auto;
 }
 
+.admin-actions {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.admin-actions__button {
+    background: #0077ff;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s ease-in-out;
+}
+
+.admin-actions__button:hover {
+    background: #005fcc;
+}
+
+.admin-panels {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.admin-panel {
+  background: rgba(255, 255, 255, 0.96);
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+}
+
+.admin-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-panel__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.admin-panel__count {
+  background: #0f5bc4;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: bold;
+  min-width: 36px;
+  text-align: center;
+}
+
+.admin-panel__hint {
+  margin: 6px 0 12px;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-list--bookings .booking-card {
+  margin: 0;
+}
+
+.admin-list__empty {
+  margin: 0;
+  color: #666;
+  font-style: italic;
+}
+
+.admin__message {
+  margin-top: 14px;
+  color: #ff6b6b;
+  text-align: center;
+  min-height: 18px;
+}
+
 .admin-user {
-  background: white;
+  background: #f7f8fb;
   padding: 15px;
   border-radius: 8px;
-  margin-bottom: 15px;
+  border: 1px solid #e5e9f2;
+}
+
+.admin-user__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-user__name {
+  margin: 0;
+}
+
+.admin-user__role {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e2ecff;
+  color: #0f5bc4;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.admin-user__meta {
+  margin: 8px 0 0;
+  color: #555;
+}
+
+.admin-user__actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .admin-user__button {
@@ -455,12 +698,143 @@ body {
   border: none;
 }
 
+.admin-user__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .admin-user__button--danger {
   background: #ff6b6b;
   color: white;
 }
 
-.selected-showtime {
-  background-color: #4CAF50 !important;
-  color: white !important;
+.booking-card--compact {
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: none;
+  border: 1px solid #e5e9f2;
+}
+
+.booking-card__info--meta {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* ------------- */
+/* Manage Movies */
+/* ------------- */
+.manage-movies__title {
+    text-align: center;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.manage-movies__subtitle {
+    text-align: center;
+    margin-bottom: 30px;
+    opacity: 0.8;
+    color: lightgray;
+}
+
+.search-results {
+    width: 70%;
+    margin: 20px auto;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(6px);
+    padding: 12px 18px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    color: white;
+    gap: 20px;
+}
+
+.search-result-poster {
+    width: 80px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.search-result-info h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #fff;
+}
+
+.add-btn {
+    margin-top: 6px;
+    padding: 6px 14px;
+    background: #3da9fc;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.add-btn:hover {
+    background: #0f6ab7;
+}
+
+.manage-search {
+    width: 60%;
+    margin: 0 auto 20px auto;
+    display: block;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.movie-list-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.divider {
+    height: 20px;
+    background: none;
+    border: none;
+}
+
+.manage-listing {
+    text-align: center;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.movie-item {
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    width: 160px;
+    text-align: center;
+}
+
+.movie-img {
+    width: 100%;
+    border-radius: 6px;
+    height: 230px;
+    object-fit: cover;
+}
+
+.remove-btn {
+    margin-top: 8px;
+    background: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    background: #c9302c;
 }

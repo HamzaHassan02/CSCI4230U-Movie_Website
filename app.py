@@ -1,18 +1,27 @@
 import os, requests
 from functools import wraps
 
-from flask import Flask, redirect, render_template, session, url_for
+from flask import Flask, redirect, render_template, session, url_for, request
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from dotenv import load_dotenv
-
-from models import Booking, db
+from datetime import date, datetime, timedelta
+from chatbot.chatbot_logic import ask_movie_bot
+from models import Booking, Movie, db
 from routes.auth_routes import auth_bp
 from routes.booking_routes import booking_bp
+from routes.user_routes import user_bp
+from models import User
 
 load_dotenv()
 
 OMDB_API_KEY = "225f5d3d"
 OMDB_URL = "http://www.omdbapi.com/"
+
+set_showtimes = [
+    {"time": "2:00 PM", "available": 15},
+    {"time": "5:30 PM", "available": 9},
+    {"time": "8:00 PM", "available": 20},
+]
 
 app = Flask(__name__)
 # Configure SQLite Database
@@ -29,6 +38,7 @@ db.init_app(app)
 jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(booking_bp)
+app.register_blueprint(user_bp)
 
 with app.app_context():
     db.create_all()
@@ -39,69 +49,6 @@ def inject_user_context():
         "current_user_role": session.get("role"),
         "current_username": session.get("username"),
     }
-
-
-# -----------------------
-# Dummy Data (Temporary)
-# -----------------------
-def get_movie_data(title):
-    params = {
-        "t": title,
-        "apikey": OMDB_API_KEY
-    }
-    response = requests.get(OMDB_URL, params=params)
-    return response.json()
-
-movies_to_fetch = [
-    "Interstellar",
-    "Inception",
-    "The Dark Knight",
-    "Avatar",
-    "Avengers: Endgame",
-    "Oppenheimer",
-    "Bullet Train",
-    "The Matrix",
-    "The Shawshank Redemption",
-    "Pulp Fiction",
-    "The Lord of the Rings: The Fellowship of the Ring",
-    "Spider-Man: No Way Home",
-    "Joker",
-    "Guardians of the Galaxy"
-]
-
-dummy_movies = []
-
-for idx, title in enumerate(movies_to_fetch, 1):
-    data = get_movie_data(title)
-
-    dummy_movies.append({
-        "id": data.get("imdbID"),
-        "title": data.get("Title"),
-        "poster_url": data.get("Poster"),
-        "director": data.get("Director"),
-        "studio": data.get("Production"),
-        "genre": data.get("Genre"),
-        "rating": data.get("imdbRating"),
-        "runtime": data.get("Runtime"),
-        "actors": data.get("Actors"),
-        "plot": data.get("Plot"),
-        "released": data.get("Released"),
-    })
-
-dummy_bookings = [
-    {
-        "id": 10,
-        "movie_title": "Interstellar",
-        "datetime": "Feb 14, 2025 - 7:00 PM",
-        "quantity": 2
-    }
-]
-
-dummy_showtimes = [
-    {"time": "2:00 PM", "available": 15},
-    {"time": "5:30 PM", "available": 9},
-    {"time": "8:00 PM", "available": 20},
-]
 
 def login_required_view(fn):
     @wraps(fn)
@@ -115,45 +62,92 @@ def login_required_view(fn):
     return wrapper
 
 
+# -----------------------
+# Routes
+# -----------------------
 @app.route("/")
 def home_page():
-    return render_template("index.html")
+    return render_template("index.html") # route to login page
 
 @app.route("/home")
 @login_required_view
 def home():
-    return render_template("home.html", movies=dummy_movies)
+    movies = Movie.query.all()
+    return render_template("home.html", movies=movies)
+
+@app.route("/api/chat", methods=["POST"])
+@login_required_view
+def movie_chat():
+    if not request.is_json:
+        return {"error": "JSON body required"}, 400
+
+    message = (request.json.get("message") or "").strip()
+    if not message:
+        return {"error": "Empty message"}, 400
+
+    answer = ask_movie_bot(message)
+    return {"reply": answer}
 
 @app.route("/movie/<movie_id>")
 @login_required_view
 def movie_detail(movie_id):
-    movie = next((m for m in dummy_movies if m["id"] == movie_id), None)
-    return render_template("movie.html", movie=movie)
+    # Get movie from DB (does not contain full movie data)
+    movie = Movie.query.filter_by(imdb_id=movie_id).first()
+    if not movie:
+        return "Movie not found", 404
+
+    # Fetch full OMDB data
+    omdb_data = requests.get(
+        f"http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={movie.imdb_id}&plot=full"
+    ).json()
+
+    # Build a full movie detail object
+    movie_details = {
+        "title": movie.title,
+        "poster": omdb_data.get("Poster"),
+        "director": omdb_data.get("Director"),
+        "studio": omdb_data.get("Production"),
+        "genre": omdb_data.get("Genre"),
+        "rating": omdb_data.get("imdbRating"),
+        "runtime": omdb_data.get("Runtime"),
+        "actors": omdb_data.get("Actors"),
+        "plot": omdb_data.get("Plot"),
+        "released": omdb_data.get("Released"),
+        "imdb_id": movie.imdb_id
+    }
+
+    return render_template("movie.html", movie=movie_details)
 
 @app.route("/booking/<movie_id>")
 @login_required_view
 def booking(movie_id):
-    movie = next((m for m in dummy_movies if m["id"] == movie_id), None)
-    return render_template("booking.html", movie=movie, showtimes=dummy_showtimes, existing_booking=None)
+    movie = Movie.query.filter_by(imdb_id=movie_id).first()
+    return render_template(
+        "booking.html", movie=movie, 
+        showtimes=set_showtimes, 
+        existing_booking=None, 
+        today=date.today().isoformat()        
+    )
 
 
 @app.route("/booking/edit/<int:booking_id>")
 @login_required_view
 def edit_booking(booking_id):
     username = session.get("username")
+    is_admin = session.get("role") == "admin"
     if not username:
         return redirect(url_for("auth.login"))
 
     booking_record = Booking.query.get_or_404(booking_id)
-    if booking_record.booked_by != username:
+    if not is_admin and booking_record.booked_by != username:
         return redirect(url_for("bookings"))
 
-    movie = next((m for m in dummy_movies if m["title"] == booking_record.movie_title), None)
+    movie = Movie.query.filter_by(title=booking_record.movie_title).first()
     if not movie:
         movie = {
             "id": 0,
             "title": booking_record.movie_title,
-            "poster_url": "",
+            "poster": "",
             "director": "",
             "genre": "",
             "rating": "",
@@ -166,7 +160,13 @@ def edit_booking(booking_id):
         "quantity": booking_record.quantity,
     }
 
-    return render_template("booking.html", movie=movie, showtimes=dummy_showtimes, existing_booking=existing_booking)
+    return render_template(
+        "booking.html",
+        movie=movie,
+        showtimes=set_showtimes,
+        existing_booking=existing_booking,
+        today=date.today().isoformat()
+    )
 
 @app.route("/my-bookings")
 @login_required_view
@@ -209,6 +209,87 @@ def admin_dashboard():
         {"username": "student", "booking_count": 1},
     ]
     return render_template("admin.html", users=dummy_users)
+
+@app.route("/admin/manage-movies")
+@login_required_view
+def manage_movies():
+    # Only admin allowed
+    if session.get("role") != "admin":
+        return redirect(url_for("home"))
+
+    movies = Movie.query.all()
+    week = (date.today() + timedelta(days=7)).isoformat()
+    return render_template("manage_movies.html", movies=movies, week=week)
+
+@app.route("/admin/search-movies", methods=["GET"])
+@login_required_view
+def search_movies():
+    if session.get("role") != "admin":
+        return {"error": "Unauthorized"}, 403
+
+    query = request.args.get("q", "")
+    if not query:
+        return {"error": "Missing query"}, 400
+
+    url = f"http://www.omdbapi.com/?apikey={OMDB_API_KEY}&s={query}&type=movie"
+    res = requests.get(url).json()
+
+    if res.get("Response") == "False":
+        return {"results": []}
+
+    return {"results": res.get("Search", [])}
+
+@app.route("/admin/add-movie", methods=["POST"])
+@login_required_view
+def add_movie():
+    if session.get("role") != "admin":
+        return {"error": "Unauthorized"}, 403
+
+    data = request.json
+    imdb_id = data.get("imdb_id")
+    title = data.get("title")
+    year = data.get("year")
+    poster = data.get("poster")
+    expiration_str = data.get("expiration")
+    
+    expiration = None
+    if expiration_str:
+        expiration = datetime.strptime(expiration_str, "%Y-%m-%d").date()
+
+    # Check DB duplicate
+    existing_movie = Movie.query.filter_by(imdb_id=imdb_id).first()
+    if existing_movie:
+        return {"message": "Movie already added"}
+
+    # Save to DB
+    new_movie = Movie(
+        imdb_id=imdb_id,
+        title=title,
+        year=year,
+        poster=poster,
+        expiration=expiration
+    )
+    db.session.add(new_movie)
+    db.session.commit()
+
+    return {"message": "Movie added"}
+
+@app.route("/admin/remove-movie", methods=["POST"])
+@login_required_view
+def remove_movie():
+    if session.get("role") != "admin":
+        return {"error": "Unauthorized"}, 403
+
+    data = request.json
+    imdb_id = data.get("imdb_id")
+
+    movie = Movie.query.filter_by(imdb_id=imdb_id).first()
+    if movie:
+        db.session.delete(movie)
+        db.session.commit()
+
+    return {"message": "Movie removed"}
+
 
 if __name__ == '__main__':
     with app.app_context():

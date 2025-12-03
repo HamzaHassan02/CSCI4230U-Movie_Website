@@ -3,14 +3,34 @@
 {% set show_navbar = true %}
 {% block content %}
 <h1 class="admin__title">Admin Dashboard</h1>
-<div class="admin">
-{% for user in users %}
-<div class="admin-user">
-<h3 class="admin-user__name">{{ user.username }}</h3>
-<p class="admin-user__count">Bookings: {{ user.booking_count }}</p>
-<button class="admin-user__button">Edit Bookings</button>
-<button class="admin-user__button admin-user__button--danger">Remove User</button>
-</div>
-{% endfor %}
+<div class="admin" id="adminPage" data-current-username="{{ current_username or '' }}">
+
+    <div class="admin-actions">
+        <a class="admin-actions__button" href="{{ url_for('manage_movies') }}">
+            Manage Movies
+        </a>
+    </div>
+
+    <div class="admin-panels">
+        <section class="admin-panel">
+            <div class="admin-panel__header">
+                <h2 class="admin-panel__title">All Users</h2>
+                <span class="admin-panel__count" id="userCount">—</span>
+            </div>
+            <p class="admin-panel__hint">View every account (admin only).</p>
+            <div id="userList" class="admin-list" data-empty-text="No users found."></div>
+        </section>
+
+        <section class="admin-panel">
+            <div class="admin-panel__header">
+                <h2 class="admin-panel__title">All Bookings</h2>
+                <span class="admin-panel__count" id="bookingCount">—</span>
+            </div>
+            <p class="admin-panel__hint">Latest activity across all users.</p>
+            <div id="bookingList" class="admin-list admin-list--bookings" data-empty-text="No bookings found."></div>
+        </section>
+    </div>
+
+    <p id="adminMessage" class="admin__message"></p>
 </div>
 {% endblock %}

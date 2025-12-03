@@ -6,3 +6,5 @@ __pycache__/
 .env
 .venv/
 .DS_Store
+downloaded_files/
+latest_logs/

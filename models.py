@@ -22,3 +22,12 @@ class Booking(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     booked_by = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+class Movie(db.Model):
+    __tablename__ = 'movies'
+    id = db.Column(db.Integer, primary_key=True)
+    imdb_id = db.Column(db.String(20), unique=True, nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    year = db.Column(db.String(10), nullable=False)
+    poster = db.Column(db.String(300), nullable=False)
+    expiration = db.Column(db.Date, nullable=True)

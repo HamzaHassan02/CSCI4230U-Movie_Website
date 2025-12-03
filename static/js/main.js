@@ -491,3 +491,67 @@ document.addEventListener('DOMContentLoaded', () => {
   initBookingsPage();
   initBookingForm();
 });
+
+// Homepage Chatbot logic
+(function () {
+  const toggleBtn = document.getElementById("movie-chatbot-toggle");
+  const windowEl = document.getElementById("movie-chatbot-window");
+  const closeBtn = document.getElementById("movie-chatbot-close");
+  const messagesEl = document.getElementById("movie-chatbot-messages");
+  const form = document.getElementById("movie-chatbot-form");
+  const input = document.getElementById("movie-chatbot-input");
+
+  if (!toggleBtn) return; // ensures this only runs on home.html
+
+  function appendMessage(text, sender) {
+    const div = document.createElement("div");
+    div.classList.add("movie-chatbot__message");
+    div.classList.add(
+      sender === "user"
+        ? "movie-chatbot__message--user"
+        : "movie-chatbot__message--bot"
+    );
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    windowEl.classList.toggle("movie-chatbot--hidden");
+    if (!windowEl.classList.contains("movie-chatbot--hidden")) {
+      input.focus();
+    }
+  });
+
+  closeBtn.addEventListener("click", () => {
+    windowEl.classList.add("movie-chatbot--hidden");
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+
+    appendMessage(text, "user");
+    input.value = "";
+    const thinking = appendMessage("Thinking...", "bot");
+
+    try {
+      const resp = await fetch(window.CHAT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      });
+
+      const data = await resp.json();
+      thinking.textContent =
+        data.reply || "Sorry, I didn't understand that.";
+    } catch (err) {
+      console.error(err);
+      thinking.textContent =
+        "Error contacting the movie assistant.";
+    }
+  });
+})();
+

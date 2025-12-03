@@ -5,7 +5,7 @@ from flask import Flask, redirect, render_template, session, url_for, request
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from dotenv import load_dotenv
 from datetime import date, datetime, timedelta
-
+from chatbot.chatbot_logic import ask_movie_bot
 from models import Booking, Movie, db
 from routes.auth_routes import auth_bp
 from routes.booking_routes import booking_bp
@@ -16,6 +16,12 @@ load_dotenv()
 
 OMDB_API_KEY = "225f5d3d"
 OMDB_URL = "http://www.omdbapi.com/"
+
+set_showtimes = [
+    {"time": "2:00 PM", "available": 15},
+    {"time": "5:30 PM", "available": 9},
+    {"time": "8:00 PM", "available": 20},
+]
 
 app = Flask(__name__)
 # Configure SQLite Database
@@ -44,16 +50,6 @@ def inject_user_context():
         "current_username": session.get("username"),
     }
 
-
-# -----------------------
-# Dummy Data (Temporary)
-# -----------------------
-dummy_showtimes = [
-    {"time": "2:00 PM", "available": 15},
-    {"time": "5:30 PM", "available": 9},
-    {"time": "8:00 PM", "available": 20},
-]
-
 def login_required_view(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -66,6 +62,9 @@ def login_required_view(fn):
     return wrapper
 
 
+# -----------------------
+# Routes
+# -----------------------
 @app.route("/")
 def home_page():
     return render_template("index.html") # route to login page
@@ -75,6 +74,19 @@ def home_page():
 def home():
     movies = Movie.query.all()
     return render_template("home.html", movies=movies)
+
+@app.route("/api/chat", methods=["POST"])
+@login_required_view
+def movie_chat():
+    if not request.is_json:
+        return {"error": "JSON body required"}, 400
+
+    message = (request.json.get("message") or "").strip()
+    if not message:
+        return {"error": "Empty message"}, 400
+
+    answer = ask_movie_bot(message)
+    return {"reply": answer}
 
 @app.route("/movie/<movie_id>")
 @login_required_view
@@ -112,7 +124,7 @@ def booking(movie_id):
     movie = Movie.query.filter_by(imdb_id=movie_id).first()
     return render_template(
         "booking.html", movie=movie, 
-        showtimes=dummy_showtimes, 
+        showtimes=set_showtimes, 
         existing_booking=None, 
         today=date.today().isoformat()        
     )
@@ -151,7 +163,7 @@ def edit_booking(booking_id):
     return render_template(
         "booking.html",
         movie=movie,
-        showtimes=dummy_showtimes,
+        showtimes=set_showtimes,
         existing_booking=existing_booking,
         today=date.today().isoformat()
     )
@@ -277,6 +289,7 @@ def remove_movie():
         db.session.commit()
 
     return {"message": "Movie removed"}
+
 
 if __name__ == '__main__':
     with app.app_context():

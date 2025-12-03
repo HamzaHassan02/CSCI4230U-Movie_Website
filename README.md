@@ -32,11 +32,16 @@ DATABASE_URL=sqlite:///database.db
 STRIPE_SECRET_KEY= 
 TICKET_PRICE_CENTS=1300
 ```
-4. Seed admin & movies
+4. Pull the LLM and Run Ollama in a seperate terminal
+```
+ollama pull gemma3:1b
+ollama serve
+```
+5. Seed admin & movies
 ```
 python seed.py
 ```
-5. Start app
+6. Start app
 ```
 python app.py
 ```

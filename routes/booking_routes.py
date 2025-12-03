@@ -182,13 +182,13 @@ def create_checkout_session():
     if not username:
         return jsonify({"message": "Authentication required"}), 401
 
-    if not stripe.api_key:
-        return jsonify({"message": "Stripe not configured"}), 500
-
     payload = request.get_json() or {}
     validated = _validate_booking_payload(payload)
     if validated["errors"]:
         return jsonify({"message": "Invalid booking payload", "errors": validated["errors"]}), 400
+
+    if not stripe.api_key:
+        return jsonify({"message": "Stripe not configured"}), 500
 
     # Use per-ticket price; Stripe will multiply by quantity internally
     unit_amount = TICKET_PRICE_CENTS
@@ -289,7 +289,6 @@ def checkout_success():
 @booking_bp.route("/checkout/cancel")
 def checkout_cancel():
     return render_template("checkout_cancel.html")
-
 
 @booking_bp.route("/webhook/stripe", methods=["POST"])
 def stripe_webhook():

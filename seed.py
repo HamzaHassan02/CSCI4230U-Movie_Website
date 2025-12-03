@@ -3,6 +3,7 @@ import requests
 import bcrypt
 from app import app, db
 from models import User, Movie
+from sqlalchemy import inspect, text
 from datetime import date, timedelta
 
 OMDB_API_KEY = "225f5d3d"
@@ -39,6 +40,14 @@ def hash_password(password, pepper, salt=None):
     return hashed, salt
 
 with app.app_context():
+    # Ensure legacy databases have the expiration column
+    inspector = inspect(db.engine)
+    if inspector.has_table("movies"):
+        cols = {col["name"] for col in inspector.get_columns("movies")}
+        if "expiration" not in cols:
+            # SQLite allows adding nullable columns via ALTER TABLE
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE movies ADD COLUMN expiration DATE"))
 
     # ------------------------------
     # Seed Admin User
